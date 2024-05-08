@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class InterfaceInitializer : MonoBehaviour {
+public class BoardGeneratorInit : MonoBehaviour {
 
     public Sprite tileSprite;
 
