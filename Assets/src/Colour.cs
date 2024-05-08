@@ -1,4 +1,6 @@
-﻿public enum Colour {
-    LIGHT,
-    DARK
+﻿namespace Assets.src {
+    public enum Colour {
+        LIGHT,
+        DARK
+    }
 }

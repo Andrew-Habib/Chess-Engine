@@ -1,6 +1,10 @@
 ﻿using System.Collections.Generic;
-public interface ChessPiece{
-    Colour colour();
-    PieceValue value();
-    List<Tile> possibleMoves(); 
+namespace Assets.src {
+    public interface ChessPiece {
+        int getValue();
+        Colour getColour();
+        Tile getTile();
+        List<Tile> possibleMoves();
+        void move();
+    }
 }
