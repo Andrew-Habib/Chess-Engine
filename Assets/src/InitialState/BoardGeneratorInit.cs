@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PawnTest : MonoBehaviour {
+public class BoardGeneratorInit : MonoBehaviour {
 
     public Sprite tileSprite;
 
