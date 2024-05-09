@@ -11,9 +11,8 @@ namespace Assets.src {
         private bool checkmated;
         private bool stalemated;
 
-        public King(Colour colour, Tile tile) : base(colour, tile) {
+        public King(Colour colour) : base(colour) {
             this.colour = colour;
-            this.tile = tile;
 
             this.castlePrivelege = true;
             this.kingSideCastle = false;
@@ -27,10 +26,6 @@ namespace Assets.src {
 
         public override List<Tile> possibleMoves() {
             return new List<Tile>();
-        }
-
-        public override void move() {
-            this.castlePrivelege = false;
         }
 
     }
