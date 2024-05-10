@@ -2,9 +2,15 @@
     class Board {
 
         private Tile[,] tiles;
+        private Player pWhite;
+        private Player pBlack;
 
-        public Board() {
+        public Board(Player p1, Player p2) {
             this.tiles = new Tile[8, 8];
+            this.pWhite = p1;
+            this.pBlack = p2;
+            this.pWhite.initPlayer(Colour.LIGHT);
+            this.pBlack.initPlayer(Colour.DARK);
         }
 
         public void initChessBoard() {
@@ -53,8 +59,14 @@
 
         }
 
-        public Tile getTileAt(int row, int col) {
-            return this.tiles[row, col];
+        public Tile getTileAt(int r, int c) {
+            return this.tiles[r, c];
+        }
+
+        public void generatePawnMoves(int row, int col) {
+            // White pawn goes forward and black pawn goes backwards
+            int dir_pawn = (this.pWhite.isTurn()) ? 1 : -1;
+
         }
 
     }
