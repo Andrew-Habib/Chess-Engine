@@ -11,7 +11,7 @@
             this.colour = colour;
             this.row = r;
             this.column = c;
-            this.coord = ((char)('a' + this.column)).ToString() + (this.row + 1).ToString();
+            this.coord = ChessTools.gridToChessCoord(this.row, this.column);
         }
 
         public abstract PieceType getType();
@@ -37,7 +37,7 @@
         public void setLocation(int r, int c) {
             this.row = r;
             this.column = c;
-            this.coord = ((char)('a' + this.column)).ToString() + (this.row + 1).ToString();
+            this.coord = ChessTools.gridToChessCoord(this.row, this.column);
         }
 
     }

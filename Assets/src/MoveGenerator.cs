@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using UnityEngine;
+using System;
+using System.Collections.Generic;
+// TODO - Pinned piece or in check
 
 namespace Assets.src {
 
@@ -30,13 +33,14 @@ namespace Assets.src {
 
             foreach (var possible in knightHopCombos) { // Check all knight hops
 
-                int possibleRow = piece.getRow() + possible.Item1;
-                int possibleCol = piece.getColumn() + possible.Item2;
+                int possibleRow = row + possible.Item1;
+                int possibleCol = col + possible.Item2;
 
-                if (Board.inbounds(possibleRow, possibleCol)) { // Check if knight hop in bounds of chess board
+                if (ChessTools.inbounds(possibleRow, possibleCol)) { // Check if knight hop in bounds of chess board
                     // Check if the possible hop location does not contain a team piece - VALID square condition
-                    if (!(piece.getColour().Equals(board[row + possibleRow, col + possibleCol].getColour()))) {
-                        moves.Add(new int[] {row + possibleRow, col + possibleCol});
+                    if (ChessTools.emptyTile(board, possibleRow, possibleCol) || 
+                        ChessTools.enemyAtDestination(piece, board, possibleRow, possibleCol)) {
+                        moves.Add(new int[] {possibleRow, possibleCol});
                     }
                 }
 
@@ -49,7 +53,9 @@ namespace Assets.src {
         public static List<int[]> generateBishopMoves(ChessPiece piece, ChessPiece[,] board, bool whiteTurn) {
             List<int[]> moves = new List<int[]>();
 
-
+            for (int i = 0; i < 8; i++) {
+                
+            }
 
             return moves;
         }

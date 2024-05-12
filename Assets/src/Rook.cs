@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Assets.src {
+﻿namespace Assets.src {
 
     public class Rook : GenericPiece {
 

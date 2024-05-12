@@ -9,11 +9,6 @@
             this.turn = true ? (this.colour == Colour.LIGHT) : false;
         }
 
-        public void initPlayer(Colour col) {
-            this.colour = col;
-            this.turn = true ? (this.colour == Colour.LIGHT) : false;
-        }
-
         public void switchTurn() {
             this.turn = !this.turn;
         }
