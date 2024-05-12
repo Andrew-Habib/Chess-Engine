@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
-namespace Assets.src {
+﻿namespace Assets.src {
     public interface ChessPiece {
+        PieceType getType();
         int getValue();
         Colour getColour();
-        List<Tile> possibleMoves();
+        int getRow();
+        int getColumn();
+        string getCoord();
+        void setLocation(int r, int c);
     }
 }

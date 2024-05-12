@@ -11,22 +11,13 @@ namespace Assets.src {
         private bool checkmated;
         private bool stalemated;
 
-        public King(Colour colour) : base(colour) {
-            this.colour = colour;
+        public King(Colour colour, int row, int column) : base(colour, row, column) {
 
-            this.castlePrivelege = true;
-            this.kingSideCastle = false;
-            this.QueenSideCastle = false;
-            this.inCheck = false;
-            this.checkmated = false;
-            this.stalemated = false;
-    }
-
-        public override int getValue() => (int) PieceValue.KING;
-
-        public override List<Tile> possibleMoves() {
-            return new List<Tile>();
         }
+
+        public override PieceType getType() => PieceType.KING;
+
+        public override int getValue() => (int) PieceType.KING;
 
     }
 

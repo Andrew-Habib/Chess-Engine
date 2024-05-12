@@ -4,15 +4,12 @@ namespace Assets.src {
 
     public class Rook : GenericPiece {
 
-        public Rook(Colour colour) : base(colour) {
-            this.colour = colour;
+        public Rook(Colour colour, int row, int column) : base(colour, row, column) {
         }
 
-        public override int getValue() => (int) PieceValue.ROOK;
+        public override PieceType getType() => PieceType.ROOK;
 
-        public override List<Tile> possibleMoves() {
-            return new List<Tile>();
-        }
+        public override int getValue() => (int) PieceType.ROOK;
 
     }
 

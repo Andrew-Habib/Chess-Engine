@@ -4,15 +4,13 @@ namespace Assets.src {
 
     public class Knight : GenericPiece {
 
-        public Knight(Colour colour) : base(colour) {
+        public Knight(Colour colour, int row, int column) : base(colour, row, column) {
             this.colour = colour;
         }
 
-        public override int getValue() => (int) PieceValue.KNIGHT;
+        public override PieceType getType() => PieceType.KNIGHT;
 
-        public override List<Tile> possibleMoves() {
-            return new List<Tile>();
-        }
+        public override int getValue() => (int) PieceType.KNIGHT;
 
     }
 

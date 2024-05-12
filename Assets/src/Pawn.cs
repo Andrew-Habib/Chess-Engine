@@ -4,15 +4,12 @@ namespace Assets.src {
 
     public class Pawn : GenericPiece {
 
-        public Pawn(Colour colour) : base(colour) {
-            this.colour = colour;
+        public Pawn(Colour colour, int row, int column) : base(colour, row, column) {
         }
 
-        public override int getValue() => (int) PieceValue.PAWN;
+        public override PieceType getType() => PieceType.PAWN;
 
-        public override List<Tile> possibleMoves() {
-            return new List<Tile>();
-        }
+        public override int getValue() => (int) PieceType.PAWN;
 
     }
 

@@ -4,15 +4,12 @@ namespace Assets.src {
 
     public class Queen : GenericPiece {
 
-        public Queen(Colour colour) : base(colour) {
-            this.colour = colour;
+        public Queen(Colour colour, int row, int column) : base(colour, row, column) {
         }
 
-        public override int getValue() => (int) PieceValue.QUEEN;
+        public override PieceType getType() => PieceType.QUEEN;
 
-        public override List<Tile> possibleMoves() {
-            return new List<Tile>();
-        }
+        public override int getValue() => (int) PieceType.QUEEN;
 
     }
 

@@ -4,15 +4,12 @@ namespace Assets.src {
 
     public class Bishop : GenericPiece {
 
-        public Bishop(Colour colour) : base(colour) {
-            this.colour = colour;
+        public Bishop(Colour colour, int row, int column) : base(colour, row, column) {
         }
 
-        public override int getValue() => (int) PieceValue.BISHOP;
+        public override PieceType getType() => PieceType.BISHOP;
 
-        public override List<Tile> possibleMoves() {
-            return new List<Tile>();
-        }
+        public override int getValue() => (int) PieceType.BISHOP - 1;
 
     }
 
