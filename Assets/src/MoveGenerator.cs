@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System;
 using System.Collections.Generic;
 // TODO - Pinned piece or in check
 
@@ -51,13 +50,42 @@ namespace Assets.src {
         }
 
         public static List<int[]> generateBishopMoves(ChessPiece piece, ChessPiece[,] board, bool whiteTurn) {
+            
             List<int[]> moves = new List<int[]>();
 
-            for (int i = 0; i < 8; i++) {
+            int row = piece.getRow();
+            int col = piece.getColumn();
+
+            (int, int)[] bishopDirections =
+            {
+                (-1, -1),
+                (-1, 1),
+                (1, -1),
+                (1, 1)
+            };
+
+            foreach (var dir in bishopDirections) {
                 
+                for (int i = 1; ChessTools.inbounds(row + i * dir.Item1, col + i * dir.Item2); i++) { // Top Right Checks
+
+                    int newRow = row + i * dir.Item1;
+                    int newCol = col + i * dir.Item2;
+
+                    if (ChessTools.emptyTile(board, newRow, newCol)) {
+                        moves.Add(new int[] { newRow, newCol });
+                    } else if (ChessTools.enemyAtDestination(piece, board, newRow, newCol)) {
+                        moves.Add(new int[] { newRow, newCol });
+                        break;
+                    } else {
+                        break;
+                    }
+
+                }
+
             }
 
             return moves;
+
         }
 
         public static List<int[]> generateRookMoves(ChessPiece piece, ChessPiece[,] board, bool whiteTurn) {
