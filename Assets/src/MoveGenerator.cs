@@ -115,8 +115,14 @@ namespace Assets.src {
         }
 
         public static List<int[]> generateQueenMoves(ChessPiece piece, ChessPiece[,] board, bool whiteTurn) {
-            List<int[]> moves = new List<int[]>(); // Queen moves are combination of Rook and Bishop Moves
+            // Queen moves are combination of Rook and Bishop Moves - Union of Two Sets
+            List<int[]> moves = new List<int[]>();
+
+            moves.AddRange(generateBishopMoves(piece, board, whiteTurn));
+            moves.AddRange(generateRookMoves(piece, board, whiteTurn));
+
             return moves;
+
         }
 
         public static List<int[]> generateKingMoves(ChessPiece piece, ChessPiece[,] board, bool whiteTurn) {

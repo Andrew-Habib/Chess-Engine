@@ -50,8 +50,8 @@ namespace Assets.src {
             this.board.initChessBoard();
             
             // Debugging - Checks Move Generators on the Unity Environment
-            for (int i = 0; i < this.board.generateLegalMoves(0, 0).Count; i++) {
-                int[] array = this.board.generateLegalMoves(0, 0)[i];
+            for (int i = 0; i < this.board.generateLegalMoves(0, 3).Count; i++) {
+                int[] array = this.board.generateLegalMoves(0, 3)[i];
                 Debug.Log($"Array {i + 1}: " + array[0] + " " + array[1]);
             }
 
