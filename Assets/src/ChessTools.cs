@@ -14,7 +14,7 @@
         }
 
         public static bool teamAtDestination(ChessPiece piece, ChessPiece[,] board, int r, int c) {
-            return (piece.getColour().Equals(board[r, c].getColour()));
+            return (piece.getColour() == board[r, c].getColour());
         }
 
         public static bool enemyAtDestination(ChessPiece piece, ChessPiece[,] board, int r, int c) {
