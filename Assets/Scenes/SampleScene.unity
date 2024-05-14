@@ -1827,6 +1827,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f8221656ac8ee44583e5b7887006ea5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  whitePawn0: {fileID: 0}
+  whitePawn1: {fileID: 0}
+  whitePawn2: {fileID: 0}
+  whitePawn3: {fileID: 0}
+  whitePawn4: {fileID: 0}
+  whitePawn5: {fileID: 0}
+  whitePawn6: {fileID: 0}
+  whitePawn7: {fileID: 0}
+  whiteRook0: {fileID: 0}
+  whiteRook7: {fileID: 0}
+  whiteKnight1: {fileID: 0}
+  whiteKnight6: {fileID: 0}
+  whiteBishop2: {fileID: 0}
+  whiteBishop5: {fileID: 0}
+  whiteQueen: {fileID: 0}
+  whiteKing: {fileID: 0}
+  blackPawn0: {fileID: 0}
+  blackPawn1: {fileID: 0}
+  blackPawn2: {fileID: 0}
+  blackPawn3: {fileID: 0}
+  blackPawn4: {fileID: 0}
+  blackPawn5: {fileID: 0}
+  blackPawn6: {fileID: 0}
+  blackPawn7: {fileID: 0}
+  blackRook0: {fileID: 0}
+  blackRook7: {fileID: 0}
+  blackKnight1: {fileID: 0}
+  blackKnight6: {fileID: 0}
+  blackBishop2: {fileID: 0}
+  blackBishop5: {fileID: 0}
+  blackQueen: {fileID: 0}
+  blackKing: {fileID: 0}
 --- !u!1 &532847353
 GameObject:
   m_ObjectHideFlags: 0

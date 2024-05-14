@@ -7,8 +7,39 @@ namespace Assets.src {
     static class MoveGenerator {
 
         public static List<int[]> generatePawnMoves(ChessPiece piece, ChessPiece[,] board, bool whiteTurn) {
+
             List<int[]> moves = new List<int[]>();
-            return new List<int[]>();
+
+            int row = piece.getRow();
+            int col = piece.getColumn();
+            int dir = whiteTurn ? 1 : -1;
+
+            // Moving Forward - 1 Square (Maybe 2)
+            if (ChessTools.emptyTile(board, row + dir, col)) { 
+                moves.Add(new int[] { row + dir, col });
+                // If the pawn has not moved yet, allow the pawnt to move up a second square
+                if (!((Pawn)piece).hasMoved() && ChessTools.emptyTile(board, row + 2 * dir, col))
+                    moves.Add(new int[] { row + 2 * dir, col });
+            }
+
+            // Capturing Opposing Pieces Diagonally Forward
+            if (ChessTools.enemyAtDestination(piece, board, row + dir, col - 1))
+                moves.Add(new int[] { row + dir, col - 1 }); 
+            if (ChessTools.enemyAtDestination(piece, board, row + dir, col + 1))
+                moves.Add(new int[] { row + dir, col + 1 });
+
+            // Capturing Opposing Pieces with enpassent left and right
+            if (ChessTools.enemyAtDestination(piece, board, row, col - 1) && 
+                ((Pawn)board[row, col - 1]).isCapturableByEnpassent()) {
+                moves.Add(new int[] { row + dir, col - 1 });
+            }
+            if (ChessTools.enemyAtDestination(piece, board, row, col + 1) &&
+                ((Pawn)board[row, col + 1]).isCapturableByEnpassent()) {
+                moves.Add(new int[] { row + dir, col + 1 });
+            }
+
+            return moves;
+
         }
 
         public static List<int[]> generateKnightMoves(ChessPiece piece, ChessPiece[,] board, bool whiteTurn) {

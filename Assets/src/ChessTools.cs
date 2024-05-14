@@ -14,12 +14,14 @@
         }
 
         public static bool teamAtDestination(ChessPiece piece, ChessPiece[,] board, int r, int c) {
-            return (piece.getColour() == board[r, c].getColour());
+            return piece != null && !emptyTile(board, r, c) && piece.getColour() == board[r, c].getColour();
         }
 
         public static bool enemyAtDestination(ChessPiece piece, ChessPiece[,] board, int r, int c) {
-            return !(teamAtDestination(piece, board, r, c));
+            return piece != null && !emptyTile(board, r, c) && piece.getColour() != board[r, c].getColour();
         }
 
     }
 }
+
+// TODO - Implement Try catches for static methods

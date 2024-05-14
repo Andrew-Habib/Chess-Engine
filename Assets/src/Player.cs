@@ -6,7 +6,7 @@
 
         public Player(Colour col) {
             this.colour = col;
-            this.turn = true ? (this.colour == Colour.LIGHT) : false;
+            this.turn = (this.colour == Colour.LIGHT);
         }
 
         public void switchTurn() {

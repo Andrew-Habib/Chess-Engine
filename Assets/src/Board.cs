@@ -41,8 +41,8 @@ namespace Assets.src {
                         } else {
                             this.tiles[i, j] = null;
                         }
-                        //} else if (i == 1) {
-                        //    this.tiles[i, j] = new Pawn(Colour.LIGHT, i, j);
+                    } else if (i == 1) {
+                        this.tiles[i, j] = new Pawn(Colour.LIGHT, i, j);
                     } else if (i == 6) {
                         this.tiles[i, j] = new Pawn(Colour.DARK, i, j);
                     } else if (i == 7) {
