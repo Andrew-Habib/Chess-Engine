@@ -218,8 +218,8 @@ GameObject:
   - component: {fileID: 20918377}
   - component: {fileID: 20918376}
   m_Layer: 0
-  m_Name: pawn_black_0 (6)
-  m_TagString: Untagged
+  m_Name: pawn_black_6
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -872,7 +872,7 @@ GameObject:
   - component: {fileID: 191640190}
   m_Layer: 0
   m_Name: rook_black_0
-  m_TagString: Untagged
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1800,21 +1800,25 @@ Camera:
   m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!4 &519420032
-Transform:
+--- !u!224 &519420032
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.5, y: 3.5, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 3.5, y: 3.5}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &519420033
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1827,38 +1831,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f8221656ac8ee44583e5b7887006ea5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  whitePawn0: {fileID: 0}
-  whitePawn1: {fileID: 0}
-  whitePawn2: {fileID: 0}
-  whitePawn3: {fileID: 0}
-  whitePawn4: {fileID: 0}
-  whitePawn5: {fileID: 0}
-  whitePawn6: {fileID: 0}
-  whitePawn7: {fileID: 0}
-  whiteRook0: {fileID: 0}
-  whiteRook7: {fileID: 0}
-  whiteKnight1: {fileID: 0}
-  whiteKnight6: {fileID: 0}
-  whiteBishop2: {fileID: 0}
-  whiteBishop5: {fileID: 0}
-  whiteQueen: {fileID: 0}
-  whiteKing: {fileID: 0}
-  blackPawn0: {fileID: 0}
-  blackPawn1: {fileID: 0}
-  blackPawn2: {fileID: 0}
-  blackPawn3: {fileID: 0}
-  blackPawn4: {fileID: 0}
-  blackPawn5: {fileID: 0}
-  blackPawn6: {fileID: 0}
-  blackPawn7: {fileID: 0}
-  blackRook0: {fileID: 0}
-  blackRook7: {fileID: 0}
-  blackKnight1: {fileID: 0}
-  blackKnight6: {fileID: 0}
-  blackBishop2: {fileID: 0}
-  blackBishop5: {fileID: 0}
-  blackQueen: {fileID: 0}
-  blackKing: {fileID: 0}
+  moveGenerate: {fileID: 1777830949972533610, guid: 24238b2af4193294191887f4d854348c, type: 3}
 --- !u!1 &532847353
 GameObject:
   m_ObjectHideFlags: 0
@@ -1873,7 +1846,7 @@ GameObject:
   - component: {fileID: 532847356}
   m_Layer: 0
   m_Name: knight_black_0
-  m_TagString: Untagged
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2009,8 +1982,8 @@ GameObject:
   - component: {fileID: 541494105}
   - component: {fileID: 541494104}
   m_Layer: 0
-  m_Name: rook_black_0 (1)
-  m_TagString: Untagged
+  m_Name: rook_black_1
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2405,7 +2378,7 @@ GameObject:
   - component: {fileID: 602938559}
   m_Layer: 0
   m_Name: king_black_0
-  m_TagString: Untagged
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2628,7 +2601,7 @@ GameObject:
   - component: {fileID: 640395475}
   m_Layer: 0
   m_Name: king_white_0
-  m_TagString: Untagged
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2764,8 +2737,8 @@ GameObject:
   - component: {fileID: 643499835}
   - component: {fileID: 643499834}
   m_Layer: 0
-  m_Name: bishop_black_0 (1)
-  m_TagString: Untagged
+  m_Name: bishop_black_1
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2988,7 +2961,7 @@ GameObject:
   - component: {fileID: 684621525}
   m_Layer: 0
   m_Name: knight_white_0
-  m_TagString: Untagged
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3124,8 +3097,8 @@ GameObject:
   - component: {fileID: 720023904}
   - component: {fileID: 720023903}
   m_Layer: 0
-  m_Name: pawn_black_0 (5)
-  m_TagString: Untagged
+  m_Name: pawn_black_5
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3262,7 +3235,7 @@ GameObject:
   - component: {fileID: 733604835}
   m_Layer: 0
   m_Name: queen_white_0
-  m_TagString: Untagged
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4258,8 +4231,8 @@ GameObject:
   - component: {fileID: 887370062}
   - component: {fileID: 887370061}
   m_Layer: 0
-  m_Name: pawn_white_0 (6)
-  m_TagString: Untagged
+  m_Name: pawn_white_6
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4327,7 +4300,7 @@ Transform:
   m_GameObject: {fileID: 887370058}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6, y: 1, z: 0}
+  m_LocalPosition: {x: 6, y: 1, z: -1}
   m_LocalScale: {x: 0.19, y: 0.19, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4653,8 +4626,8 @@ GameObject:
   - component: {fileID: 951473986}
   - component: {fileID: 951473985}
   m_Layer: 0
-  m_Name: knight_white_0 (1)
-  m_TagString: Untagged
+  m_Name: knight_white_1
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4962,8 +4935,8 @@ GameObject:
   - component: {fileID: 970008736}
   - component: {fileID: 970008735}
   m_Layer: 0
-  m_Name: pawn_black_0 (1)
-  m_TagString: Untagged
+  m_Name: pawn_black_1
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5271,8 +5244,8 @@ GameObject:
   - component: {fileID: 1049277176}
   - component: {fileID: 1049277175}
   m_Layer: 0
-  m_Name: pawn_black_0 (3)
-  m_TagString: Untagged
+  m_Name: pawn_black_3
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5494,8 +5467,8 @@ GameObject:
   - component: {fileID: 1111381544}
   - component: {fileID: 1111381543}
   m_Layer: 0
-  m_Name: pawn_white_0 (2)
-  m_TagString: Untagged
+  m_Name: pawn_white_2
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5563,7 +5536,7 @@ Transform:
   m_GameObject: {fileID: 1111381540}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2, y: 1, z: 0}
+  m_LocalPosition: {x: 2, y: 1, z: -1}
   m_LocalScale: {x: 0.19, y: 0.19, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5632,7 +5605,7 @@ GameObject:
   - component: {fileID: 1113132794}
   m_Layer: 0
   m_Name: bishop_black_0
-  m_TagString: Untagged
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5769,7 +5742,7 @@ GameObject:
   - component: {fileID: 1116236723}
   m_Layer: 0
   m_Name: pawn_black_0
-  m_TagString: Untagged
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6163,8 +6136,8 @@ GameObject:
   - component: {fileID: 1179517276}
   - component: {fileID: 1179517275}
   m_Layer: 0
-  m_Name: pawn_black_0 (2)
-  m_TagString: Untagged
+  m_Name: pawn_black_2
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6386,8 +6359,8 @@ GameObject:
   - component: {fileID: 1210620591}
   - component: {fileID: 1210620592}
   m_Layer: 0
-  m_Name: pawn_white_0 (1)
-  m_TagString: Untagged
+  m_Name: pawn_white_1
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6455,7 +6428,7 @@ Transform:
   m_GameObject: {fileID: 1210620588}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: 1, z: 0}
+  m_LocalPosition: {x: 1, y: 1, z: -1}
   m_LocalScale: {x: 0.19, y: 0.19, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6781,8 +6754,8 @@ GameObject:
   - component: {fileID: 1318557439}
   - component: {fileID: 1318557438}
   m_Layer: 0
-  m_Name: bishop_white_0 (1)
-  m_TagString: Untagged
+  m_Name: bishop_white_1
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6918,8 +6891,8 @@ GameObject:
   - component: {fileID: 1319316378}
   - component: {fileID: 1319316377}
   m_Layer: 0
-  m_Name: knight_black_0 (1)
-  m_TagString: Untagged
+  m_Name: knight_black_1
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7313,8 +7286,8 @@ GameObject:
   - component: {fileID: 1464157163}
   - component: {fileID: 1464157162}
   m_Layer: 0
-  m_Name: pawn_white_0 (3)
-  m_TagString: Untagged
+  m_Name: pawn_white_3
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7382,7 +7355,7 @@ Transform:
   m_GameObject: {fileID: 1464157159}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3, y: 1, z: 0}
+  m_LocalPosition: {x: 3, y: 1, z: -1}
   m_LocalScale: {x: 0.19, y: 0.19, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7450,8 +7423,8 @@ GameObject:
   - component: {fileID: 1465229043}
   - component: {fileID: 1465229042}
   m_Layer: 0
-  m_Name: pawn_black_0 (4)
-  m_TagString: Untagged
+  m_Name: pawn_black_4
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7587,8 +7560,8 @@ GameObject:
   - component: {fileID: 1472077238}
   - component: {fileID: 1472077237}
   m_Layer: 0
-  m_Name: rook_white_0 (1)
-  m_TagString: Untagged
+  m_Name: rook_white_1
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7724,8 +7697,8 @@ GameObject:
   - component: {fileID: 1482608416}
   - component: {fileID: 1482608415}
   m_Layer: 0
-  m_Name: pawn_white_0 (7)
-  m_TagString: Untagged
+  m_Name: pawn_white_7
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7793,7 +7766,7 @@ Transform:
   m_GameObject: {fileID: 1482608412}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7, y: 1, z: 0}
+  m_LocalPosition: {x: 7, y: 1, z: -1}
   m_LocalScale: {x: 0.19, y: 0.19, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7948,7 +7921,7 @@ GameObject:
   - component: {fileID: 1578602270}
   m_Layer: 0
   m_Name: bishop_white_0
-  m_TagString: Untagged
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8170,8 +8143,8 @@ GameObject:
   - component: {fileID: 1643190501}
   - component: {fileID: 1643190500}
   m_Layer: 0
-  m_Name: pawn_black_0 (7)
-  m_TagString: Untagged
+  m_Name: pawn_black_7
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8308,7 +8281,7 @@ GameObject:
   - component: {fileID: 1670895674}
   m_Layer: 0
   m_Name: queen_black_0
-  m_TagString: Untagged
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8960,8 +8933,8 @@ GameObject:
   - component: {fileID: 1839001610}
   - component: {fileID: 1839001611}
   m_Layer: 0
-  m_Name: pawn_white_0 (5)
-  m_TagString: Untagged
+  m_Name: pawn_white_5
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9029,7 +9002,7 @@ Transform:
   m_GameObject: {fileID: 1839001607}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 1, z: 0}
+  m_LocalPosition: {x: 5, y: 1, z: -1}
   m_LocalScale: {x: 0.19, y: 0.19, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9356,7 +9329,7 @@ GameObject:
   - component: {fileID: 1971919447}
   m_Layer: 0
   m_Name: pawn_white_0
-  m_TagString: Untagged
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9424,7 +9397,7 @@ Transform:
   m_GameObject: {fileID: 1971919444}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: -1}
   m_LocalScale: {x: 0.19, y: 0.19, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9578,8 +9551,8 @@ GameObject:
   - component: {fileID: 2043495921}
   - component: {fileID: 2043495920}
   m_Layer: 0
-  m_Name: pawn_white_0 (4)
-  m_TagString: Untagged
+  m_Name: pawn_white_4
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9647,7 +9620,7 @@ Transform:
   m_GameObject: {fileID: 2043495917}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4, y: 1, z: 0}
+  m_LocalPosition: {x: 4, y: 1, z: -1}
   m_LocalScale: {x: 0.19, y: 0.19, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9716,7 +9689,7 @@ GameObject:
   - component: {fileID: 2044540591}
   m_Layer: 0
   m_Name: rook_white_0
-  m_TagString: Untagged
+  m_TagString: Piece
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

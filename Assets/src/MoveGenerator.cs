@@ -23,17 +23,21 @@ namespace Assets.src {
             }
 
             // Capturing Opposing Pieces Diagonally Forward
-            if (ChessTools.enemyAtDestination(piece, board, row + dir, col - 1))
+            if (ChessTools.inbounds(row + dir, col - 1) &&
+                ChessTools.enemyAtDestination(piece, board, row + dir, col - 1))
                 moves.Add(new int[] { row + dir, col - 1 }); 
-            if (ChessTools.enemyAtDestination(piece, board, row + dir, col + 1))
+            if (ChessTools.inbounds(row + dir, col + 1) &&
+                ChessTools.enemyAtDestination(piece, board, row + dir, col + 1))
                 moves.Add(new int[] { row + dir, col + 1 });
 
             // Capturing Opposing Pieces with enpassent left and right
-            if (ChessTools.enemyAtDestination(piece, board, row, col - 1) && 
+            if (ChessTools.inbounds(row, col - 1) &&
+                ChessTools.enemyAtDestination(piece, board, row, col - 1) && 
                 ((Pawn)board[row, col - 1]).isCapturableByEnpassent()) {
                 moves.Add(new int[] { row + dir, col - 1 });
             }
-            if (ChessTools.enemyAtDestination(piece, board, row, col + 1) &&
+            if (ChessTools.inbounds(row, col + 1) &&
+                ChessTools.enemyAtDestination(piece, board, row, col + 1) &&
                 ((Pawn)board[row, col + 1]).isCapturableByEnpassent()) {
                 moves.Add(new int[] { row + dir, col + 1 });
             }
@@ -157,8 +161,41 @@ namespace Assets.src {
         }
 
         public static List<int[]> generateKingMoves(ChessPiece piece, ChessPiece[,] board, bool whiteTurn) {
+
             List<int[]> moves = new List<int[]>();
+
+            int row = piece.getRow();
+            int col = piece.getColumn();
+
+            (int, int)[] kingDirections =
+            {
+                (-1, 0), // Left
+                (-1, -1), // Bottom-left
+                (0, -1), // Down
+                (1, -1), // Bottom-right
+                (1, 0), // Right
+                (1, 1), // Top-right
+                (0, 1), // Up
+                (-1, 1) // Top-left
+            };
+
+            foreach (var dir in kingDirections) {
+
+                int newRow = row + dir.Item1;
+                int newCol = col + dir.Item2;
+
+                if (ChessTools.inbounds(newRow, newCol) &&
+                    (ChessTools.emptyTile(board, newRow, newCol) || 
+                    ChessTools.enemyAtDestination(piece, board, newRow, newCol))) {
+                    moves.Add(new int[] { newRow, newCol });
+                } 
+
+            }
+
+            
+
             return moves;
+
         }
 
     }

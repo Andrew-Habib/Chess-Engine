@@ -72,6 +72,10 @@ namespace Assets.src {
             return this.tiles[row, col];
         }
 
+        public bool whiteTurn() {
+            return this.isWhiteTurn;
+        }
+
         public List<int[]> generateLegalMoves(int row, int col) {
 
             if (this.getPieceAt(row, col) != null) {
@@ -81,7 +85,7 @@ namespace Assets.src {
                 if ((this.isWhiteTurn && pieceSelected.getColour() == Colour.LIGHT) ^
                     (!this.isWhiteTurn && pieceSelected.getColour() == Colour.DARK)) {
                     switch (pieceSelected.getType()) {
-                        case PieceType.PAWN:
+                        case PieceType.PAWN: 
                             return MoveGenerator.generatePawnMoves(pieceSelected, this.tiles, this.isWhiteTurn); 
                         case PieceType.KNIGHT:
                             return MoveGenerator.generateKnightMoves(pieceSelected, this.tiles, this.isWhiteTurn); 
