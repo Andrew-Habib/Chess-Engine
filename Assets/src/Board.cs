@@ -5,20 +5,12 @@ namespace Assets.src {
     class Board {
 
         private ChessPiece[,] tiles;
-        private Player pWhite;
-        private Player pBlack;
         private bool isWhiteTurn;
 
-        public Board(Player p1, Player p2) {
-
-            if(!(p1.isTurn() && !p2.isTurn())) {
-                throw new ArgumentException("Invalid entry! Player 1 must be LIGHT and Player 2 must be black.");
-            }
+        public Board() {
 
             this.tiles = new ChessPiece[8, 8];
-            this.pWhite = p1;
-            this.pBlack = p2;
-            this.isWhiteTurn = this.pWhite.isTurn();
+            this.isWhiteTurn = true;
 
         }
 
@@ -109,7 +101,18 @@ namespace Assets.src {
         }
 
         public void move(int rowPiece, int colPiece, int rowDest, int colDest) {
-            this.isWhiteTurn = !this.isWhiteTurn;
+
+            List<int[]> legalMoves = generateLegalMoves(rowPiece, colPiece);
+
+            foreach (int[] possible in legalMoves) {
+                if (rowDest == possible[0] && colDest == possible[1]) {
+                    this.tiles[rowDest, colDest] = this.tiles[rowPiece, colPiece];
+                    this.tiles[rowPiece, colPiece] = null;
+                    this.isWhiteTurn = !this.isWhiteTurn;
+                    break;
+                }
+            }          
+
         }
 
     }
