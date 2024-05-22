@@ -5,7 +5,7 @@
         private bool moved;
         private bool capturableEnpassent;
 
-        public Pawn(Colour colour, int row, int column) : base(colour, row, column) {
+        public Pawn(Colour colour) : base(colour) {
             this.moved = false;
             this.capturableEnpassent = false;
         }

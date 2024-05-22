@@ -7,7 +7,7 @@
         private bool checkmated;
         private bool stalemated;
 
-        public King(Colour colour, int row, int column) : base(colour, row, column) {
+        public King(Colour colour) : base(colour) {
             this.castlePrivelege = true;
             this.inCheck = false;
             this.checkmated = false;

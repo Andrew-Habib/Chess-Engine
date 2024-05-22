@@ -47,9 +47,10 @@ namespace Assets.src {
                     int dest_col = Mathf.RoundToInt(dest.x);
                     int dest_row = Mathf.RoundToInt(dest.y);
                     this.board.move(piece_row, piece_col, dest_row, dest_col);
-                    this.removeAllMoveSprites();
                     this.pieceSelected.transform.position = new Vector3(dest_col, dest_row, -1f);
+                    this.removeAllMoveSprites();
                     this.resetPieceSelection();
+                    this.board.DebugBoardState();
 
                 } else { // Click-Off Selected Piece
                     this.removeAllMoveSprites();

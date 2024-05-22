@@ -6,12 +6,10 @@ namespace Assets.src {
 
     static class MoveGenerator {
 
-        public static List<int[]> generatePawnMoves(ChessPiece piece, ChessPiece[,] board, bool whiteTurn) {
+        public static List<int[]> generatePawnMoves(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn) {
 
             List<int[]> moves = new List<int[]>();
 
-            int row = piece.getRow();
-            int col = piece.getColumn();
             int dir = whiteTurn ? 1 : -1;
 
             // Moving Forward - 1 Square (Maybe 2)
@@ -46,12 +44,9 @@ namespace Assets.src {
 
         }
 
-        public static List<int[]> generateKnightMoves(ChessPiece piece, ChessPiece[,] board, bool whiteTurn) {
+        public static List<int[]> generateKnightMoves(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn) {
 
             List<int[]> moves = new List<int[]>();
-
-            int row = piece.getRow();
-            int col = piece.getColumn();
 
             (int, int)[] knightHopCombos =
             {
@@ -84,12 +79,9 @@ namespace Assets.src {
 
         }
 
-        public static List<int[]> generateSlidingMoves(ChessPiece piece, ChessPiece[,] board, bool whiteTurn, (int, int)[] dirs) {
+        public static List<int[]> generateSlidingMoves(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn, (int, int)[] dirs) {
             
             List<int[]> moves = new List<int[]>();
-
-            int row = piece.getRow();
-            int col = piece.getColumn();
 
             (int, int)[] directions = dirs;
 
@@ -117,7 +109,7 @@ namespace Assets.src {
 
         }
 
-        public static List<int[]> generateBishopMoves(ChessPiece piece, ChessPiece[,] board, bool whiteTurn) {
+        public static List<int[]> generateBishopMoves(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn) {
 
             (int, int)[] bishopDirections =
             {
@@ -127,13 +119,13 @@ namespace Assets.src {
                 (1, 1)
             };
 
-            List<int[]> moves = generateSlidingMoves(piece, board, whiteTurn, bishopDirections);
+            List<int[]> moves = generateSlidingMoves(piece, row, col, board, whiteTurn, bishopDirections);
 
             return moves;
 
         }
 
-        public static List<int[]> generateRookMoves(ChessPiece piece, ChessPiece[,] board, bool whiteTurn) {
+        public static List<int[]> generateRookMoves(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn) {
 
             (int, int)[] rookDirections =
             {
@@ -143,29 +135,26 @@ namespace Assets.src {
                 (1, 0)
             };
 
-            List<int[]> moves = generateSlidingMoves(piece, board, whiteTurn, rookDirections);
+            List<int[]> moves = generateSlidingMoves(piece, row, col, board, whiteTurn, rookDirections);
 
             return moves;
 
         }
 
-        public static List<int[]> generateQueenMoves(ChessPiece piece, ChessPiece[,] board, bool whiteTurn) {
+        public static List<int[]> generateQueenMoves(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn) {
             // Queen moves are combination of Rook and Bishop Moves - Union of Two Sets
             List<int[]> moves = new List<int[]>();
 
-            moves.AddRange(generateBishopMoves(piece, board, whiteTurn));
-            moves.AddRange(generateRookMoves(piece, board, whiteTurn));
+            moves.AddRange(generateBishopMoves(piece, row, col, board, whiteTurn));
+            moves.AddRange(generateRookMoves(piece, row, col, board, whiteTurn));
 
             return moves;
 
         }
 
-        public static List<int[]> generateKingMoves(ChessPiece piece, ChessPiece[,] board, bool whiteTurn) {
+        public static List<int[]> generateKingMoves(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn) {
 
             List<int[]> moves = new List<int[]>();
-
-            int row = piece.getRow();
-            int col = piece.getColumn();
 
             (int, int)[] kingDirections =
             {

@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 using System.Collections.Generic;
 
 namespace Assets.src {
@@ -21,33 +22,33 @@ namespace Assets.src {
 
                     if (i == 0) {
                         if (j == 0 || j == 7) {
-                            this.tiles[i, j] = new Rook(Colour.LIGHT, i, j);
+                            this.tiles[i, j] = new Rook(Colour.LIGHT);
                         } else if (j == 1 || j == 6) {
-                            this.tiles[i, j] = new Knight(Colour.LIGHT, i, j);
+                            this.tiles[i, j] = new Knight(Colour.LIGHT);
                         } else if (j == 2 || j == 5) {
-                            this.tiles[i, j] = new Bishop(Colour.LIGHT, i, j);
+                            this.tiles[i, j] = new Bishop(Colour.LIGHT);
                         } else if (j == 3) {
-                            this.tiles[i, j] = new Queen(Colour.LIGHT, i, j);
+                            this.tiles[i, j] = new Queen(Colour.LIGHT);
                         } else if (j == 4) {
-                            this.tiles[i, j] = new King(Colour.LIGHT, i, j);
+                            this.tiles[i, j] = new King(Colour.LIGHT);
                         } else {
                             this.tiles[i, j] = null;
                         }
                     } else if (i == 1) {
-                        this.tiles[i, j] = new Pawn(Colour.LIGHT, i, j);
+                        this.tiles[i, j] = new Pawn(Colour.LIGHT);
                     } else if (i == 6) {
-                        this.tiles[i, j] = new Pawn(Colour.DARK, i, j);
+                        this.tiles[i, j] = new Pawn(Colour.DARK);
                     } else if (i == 7) {
                         if (j == 0 || j == 7) {
-                            this.tiles[i, j] = new Rook(Colour.DARK, i, j);
+                            this.tiles[i, j] = new Rook(Colour.DARK);
                         } else if (j == 1 || j == 6) {
-                            this.tiles[i, j] = new Knight(Colour.DARK, i, j);
+                            this.tiles[i, j] = new Knight(Colour.DARK);
                         } else if (j == 2 || j == 5) {
-                            this.tiles[i, j] = new Bishop(Colour.DARK, i, j);
+                            this.tiles[i, j] = new Bishop(Colour.DARK);
                         } else if (j == 3) {
-                            this.tiles[i, j] = new Queen(Colour.DARK, i, j);
+                            this.tiles[i, j] = new Queen(Colour.DARK);
                         } else if (j == 4) {
-                            this.tiles[i, j] = new King(Colour.DARK, i, j);
+                            this.tiles[i, j] = new King(Colour.DARK);
                         } else {
                             this.tiles[i, j] = null;
                         }
@@ -78,17 +79,17 @@ namespace Assets.src {
                     (!this.isWhiteTurn && pieceSelected.getColour() == Colour.DARK)) {
                     switch (pieceSelected.getType()) {
                         case PieceType.PAWN: 
-                            return MoveGenerator.generatePawnMoves(pieceSelected, this.tiles, this.isWhiteTurn); 
+                            return MoveGenerator.generatePawnMoves(pieceSelected, row, col, this.tiles, this.isWhiteTurn); 
                         case PieceType.KNIGHT:
-                            return MoveGenerator.generateKnightMoves(pieceSelected, this.tiles, this.isWhiteTurn); 
+                            return MoveGenerator.generateKnightMoves(pieceSelected, row, col, this.tiles, this.isWhiteTurn); 
                         case PieceType.BISHOP:
-                            return MoveGenerator.generateBishopMoves(pieceSelected, this.tiles, this.isWhiteTurn); 
+                            return MoveGenerator.generateBishopMoves(pieceSelected, row, col, this.tiles, this.isWhiteTurn); 
                         case PieceType.ROOK:
-                            return MoveGenerator.generateRookMoves(pieceSelected, this.tiles, this.isWhiteTurn); 
+                            return MoveGenerator.generateRookMoves(pieceSelected, row, col, this.tiles, this.isWhiteTurn); 
                         case PieceType.QUEEN:
-                            return MoveGenerator.generateQueenMoves(pieceSelected, this.tiles, this.isWhiteTurn); 
+                            return MoveGenerator.generateQueenMoves(pieceSelected, row, col, this.tiles, this.isWhiteTurn); 
                         case PieceType.KING:
-                            return MoveGenerator.generateKingMoves(pieceSelected, this.tiles, this.isWhiteTurn); 
+                            return MoveGenerator.generateKingMoves(pieceSelected, row, col, this.tiles, this.isWhiteTurn); 
                         default:
                             return new List<int[]>();
                     }
@@ -100,7 +101,7 @@ namespace Assets.src {
 
         }
 
-        public void move(int rowPiece, int colPiece, int rowDest, int colDest) {
+        public bool move(int rowPiece, int colPiece, int rowDest, int colDest) {
 
             List<int[]> legalMoves = generateLegalMoves(rowPiece, colPiece);
 
@@ -109,10 +110,26 @@ namespace Assets.src {
                     this.tiles[rowDest, colDest] = this.tiles[rowPiece, colPiece];
                     this.tiles[rowPiece, colPiece] = null;
                     this.isWhiteTurn = !this.isWhiteTurn;
-                    break;
+                    return true;
                 }
-            }          
+            }
 
+            return false;
+
+        }
+
+        public void DebugBoardState() {
+            for (int row = 0; row < this.tiles.GetLength(0); row++) {
+                string rowState = "";
+                for (int col = 0; col < this.tiles.GetLength(1); col++) {
+                    if (this.tiles[row, col] != null) {
+                        rowState += this.tiles[row, col].getType() + " ";
+                    } else {
+                        rowState += "Empty ";
+                    }
+                }
+                Debug.Log("Row " + row + ": " + rowState);
+            }
         }
 
     }

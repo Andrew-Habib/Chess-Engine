@@ -2,7 +2,7 @@
 
     public class Knight : GenericPiece {
 
-        public Knight(Colour colour, int row, int column) : base(colour, row, column) {
+        public Knight(Colour colour) : base(colour) {
             this.colour = colour;
         }
 

@@ -4,7 +4,7 @@ namespace Assets.src {
 
     public class Bishop : GenericPiece {
 
-        public Bishop(Colour colour, int row, int column) : base(colour, row, column) {
+        public Bishop(Colour colour) : base(colour) {
         }
 
         public override PieceType getType() => PieceType.BISHOP;

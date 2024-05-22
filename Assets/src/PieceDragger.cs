@@ -16,11 +16,12 @@ public class PieceDragger : MonoBehaviour {
     }
 
     void Update() {
-        original_pos = transform.position;
         if (dragging) {
             Vector3 newPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition) - offset;
             newPosition.z = original_pos.z;
             transform.position = newPosition;
+        } else {
+            original_pos = transform.position;
         }
     }
 

@@ -2,7 +2,7 @@
 
     public class Rook : GenericPiece {
 
-        public Rook(Colour colour, int row, int column) : base(colour, row, column) {
+        public Rook(Colour colour) : base(colour) {
         }
 
         public override PieceType getType() => PieceType.ROOK;
