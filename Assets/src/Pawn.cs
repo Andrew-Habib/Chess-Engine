@@ -14,6 +14,14 @@
 
         public override int getValue() => (int) PieceType.PAWN;
 
+        public void markAsMoved() {
+            this.moved = true;
+        }
+
+        public void setCapturableByEnpassent(bool capturable) {
+            this.capturableEnpassent = capturable;
+        }
+
         public bool hasMoved() {
             return this.moved;
         }

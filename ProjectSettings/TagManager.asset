@@ -4,7 +4,8 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Piece
+  - BlackPiece
+  - WhitePiece
   - Move
   layers:
   - Default

@@ -109,6 +109,7 @@ namespace Assets.src {
                 if (rowDest == possible[0] && colDest == possible[1]) {
                     this.tiles[rowDest, colDest] = this.tiles[rowPiece, colPiece];
                     this.tiles[rowPiece, colPiece] = null;
+                    this.confirmMoveBoardStateManager(rowPiece, colPiece, rowDest, colDest);
                     this.isWhiteTurn = !this.isWhiteTurn;
                     return true;
                 }
@@ -118,7 +119,28 @@ namespace Assets.src {
 
         }
 
-        public void DebugBoardState() {
+        private void confirmMoveBoardStateManager(int rowPiece, int colPiece, int rowDest, int colDest) {
+
+            switch (this.tiles[rowDest, colDest].getType()) {
+                case PieceType.PAWN:
+                    ((Pawn)this.tiles[rowDest, colDest]).markAsMoved();
+                    if (Math.Abs(rowDest - rowPiece) == 2) {
+                        ((Pawn)this.tiles[rowDest, colDest]).setCapturableByEnpassent(true);
+                    } else {
+                        ((Pawn)this.tiles[rowDest, colDest]).setCapturableByEnpassent(false);
+                    }
+                    if (rowDest == 0) this.tiles[rowDest, colDest] = new Queen(Colour.DARK);
+                    if (rowDest == 7) this.tiles[rowDest, colDest] = new Queen(Colour.LIGHT);
+                    break;
+                case PieceType.ROOK:
+                    break;
+                case PieceType.KING:
+                    break;
+            }
+
+        }
+
+        public void PrintBoardState() {
             for (int row = 0; row < this.tiles.GetLength(0); row++) {
                 string rowState = "";
                 for (int col = 0; col < this.tiles.GetLength(1); col++) {

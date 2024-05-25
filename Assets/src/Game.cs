@@ -32,8 +32,7 @@ namespace Assets.src {
                 Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
 
-                if (hit.collider != null && hit.collider.CompareTag("Piece")) { // Piece Selected
-
+                if (hit.collider != null && (hit.collider.CompareTag("WhitePiece") || hit.collider.CompareTag("BlackPiece"))) { // Piece Selected
                     this.pieceSelected = hit.collider.gameObject;
                     Vector2 objectPosition = pieceSelected.transform.position;
                     this.piece_col = Mathf.RoundToInt(objectPosition.x);
@@ -41,7 +40,7 @@ namespace Assets.src {
                     Debug.Log($"Hit object: {hit.collider.gameObject.name} at position ({piece_row}, {piece_col})");
                     this.generateMoveSprites(piece_row, piece_col);
 
-                } else if (hit.collider != null && hit.collider.CompareTag("Move")) { // Generated Move Selected
+                } else if (hit.collider != null && hit.collider.CompareTag("MoveCollider")) { // Generated Move Selected
 
                     Vector2 dest = hit.collider.gameObject.transform.position;
                     int dest_col = Mathf.RoundToInt(dest.x);
@@ -50,7 +49,6 @@ namespace Assets.src {
                     this.pieceSelected.transform.position = new Vector3(dest_col, dest_row, -1f);
                     this.removeAllMoveSprites();
                     this.resetPieceSelection();
-                    this.board.DebugBoardState();
 
                 } else { // Click-Off Selected Piece
                     this.removeAllMoveSprites();
@@ -75,12 +73,16 @@ namespace Assets.src {
                 spriteRenderer.sprite = moveGenerate;
 
                 imageObject.transform.position = new Vector3((float) move[1], (float) move[0], -0.5f);
-
                 imageObject.transform.localScale = new Vector3(0.15f, 0.15f, 0);
-
                 imageObject.tag = "Move";
 
-                BoxCollider2D collider = imageObject.AddComponent<BoxCollider2D>();
+                GameObject objectCollider = new GameObject("moveCollider");
+
+                objectCollider.transform.position = new Vector3((float)move[1], (float)move[0], -1.0f);
+                objectCollider.transform.localScale = new Vector3(1f, 1f, 0);
+                objectCollider.tag = "MoveCollider";
+
+                BoxCollider2D collider = objectCollider.AddComponent<BoxCollider2D>();
                 collider.isTrigger = true;
 
             }
@@ -90,6 +92,10 @@ namespace Assets.src {
             GameObject[] moveGenObjects = GameObject.FindGameObjectsWithTag("Move");
             foreach (GameObject moveObject in moveGenObjects) {
                 Destroy(moveObject);
+            }
+            GameObject[] colliderGenObjects = GameObject.FindGameObjectsWithTag("MoveCollider");
+            foreach (GameObject collider in colliderGenObjects) {
+                Destroy(collider);
             }
         }
 
