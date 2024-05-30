@@ -126,8 +126,6 @@ namespace Assets.src {
                     ((Pawn)this.tiles[rowDest, colDest]).markAsMoved();
                     if (Math.Abs(rowDest - rowPiece) == 2) {
                         ((Pawn)this.tiles[rowDest, colDest]).setCapturableByEnpassent(true);
-                    } else {
-                        ((Pawn)this.tiles[rowDest, colDest]).setCapturableByEnpassent(false);
                     }
                     if (rowDest == 0) this.tiles[rowDest, colDest] = new Queen(Colour.DARK);
                     if (rowDest == 7) this.tiles[rowDest, colDest] = new Queen(Colour.LIGHT);

@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Assets.src {
     public class Game : MonoBehaviour {
@@ -29,44 +31,43 @@ namespace Assets.src {
 
             if (Input.GetMouseButtonDown(0)) {
 
-                Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+                List<RaycastHit2D> hitList = (Physics2D.RaycastAll(Camera.main.ScreenToWorldPoint(Input.mousePosition), 
+                                                    Vector2.zero)).ToList();
+                
+                int dest_col = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).x);
+                int dest_row = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
 
-                if (hit.collider != null && (hit.collider.CompareTag("WhitePiece") || hit.collider.CompareTag("BlackPiece"))) { // Piece Selected
-                    this.pieceSelected = hit.collider.gameObject;
-                    Vector2 objectPosition = pieceSelected.transform.position;
-                    this.piece_col = Mathf.RoundToInt(objectPosition.x);
-                    this.piece_row = Mathf.RoundToInt(objectPosition.y);
-                    Debug.Log($"Hit object: {hit.collider.gameObject.name} at position ({piece_row}, {piece_col})");
-                    this.generateMoveSprites(piece_row, piece_col);
+                if (hitList.Any(hit => hit.collider.CompareTag("MoveCollider"))) {
 
-                } else if (hit.collider != null && hit.collider.CompareTag("MoveCollider")) { // Generated Move Selected
-
-                    Vector2 dest = hit.collider.gameObject.transform.position;
-                    int dest_col = Mathf.RoundToInt(dest.x);
-                    int dest_row = Mathf.RoundToInt(dest.y);
+                    Destroy(hitList.First().collider.gameObject);
                     this.board.move(piece_row, piece_col, dest_row, dest_col);
                     this.pieceSelected.transform.position = new Vector3(dest_col, dest_row, -1f);
                     this.removeAllMoveSprites();
                     this.resetPieceSelection();
 
-                } else { // Click-Off Selected Piece
+                } else if (hitList.Any(hit => hit.collider.CompareTag("WhitePiece")) ||
+                    hitList.Any(hit => hit.collider.CompareTag("BlackPiece"))) {
+
                     this.removeAllMoveSprites();
                     this.resetPieceSelection();
-                }
+                    this.pieceSelected = hitList.First().collider.gameObject;
+                    this.piece_col = dest_col;
+                    this.piece_row = dest_row;
+                    this.generateMoveSprites();
 
+                } else {
+
+                    this.removeAllMoveSprites();
+                    this.resetPieceSelection();
+
+                }
             }
 
         }
 
-        void generateMoveSprites(int row, int col) {
+        void generateMoveSprites() {
 
-            GameObject[] objectsToDelete = GameObject.FindGameObjectsWithTag("Move");
-            foreach (GameObject obj in objectsToDelete) {
-                Destroy(obj);
-            }
-
-            foreach (var move in this.board.generateLegalMoves(row, col)) {
+            foreach (var move in this.board.generateLegalMoves(piece_row, piece_col)) {
                 
                 GameObject imageObject = new GameObject("moveGen");
                 SpriteRenderer spriteRenderer = imageObject.AddComponent<SpriteRenderer>();
@@ -78,7 +79,7 @@ namespace Assets.src {
 
                 GameObject objectCollider = new GameObject("moveCollider");
 
-                objectCollider.transform.position = new Vector3((float)move[1], (float)move[0], -1.0f);
+                objectCollider.transform.position = new Vector3((float)move[1], (float)move[0], -0.5f);
                 objectCollider.transform.localScale = new Vector3(1f, 1f, 0);
                 objectCollider.tag = "MoveCollider";
 
@@ -86,15 +87,14 @@ namespace Assets.src {
                 collider.isTrigger = true;
 
             }
+
         }
 
         void removeAllMoveSprites() {
-            GameObject[] moveGenObjects = GameObject.FindGameObjectsWithTag("Move");
-            foreach (GameObject moveObject in moveGenObjects) {
+            foreach (GameObject moveObject in GameObject.FindGameObjectsWithTag("Move")) {
                 Destroy(moveObject);
             }
-            GameObject[] colliderGenObjects = GameObject.FindGameObjectsWithTag("MoveCollider");
-            foreach (GameObject collider in colliderGenObjects) {
+            foreach (GameObject collider in GameObject.FindGameObjectsWithTag("MoveCollider")) {
                 Destroy(collider);
             }
         }
