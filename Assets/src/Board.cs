@@ -123,16 +123,13 @@ namespace Assets.src {
 
             switch (this.tiles[rowDest, colDest].getType()) {
                 case PieceType.PAWN:
-                    ((Pawn)this.tiles[rowDest, colDest]).markAsMoved();
-                    if (Math.Abs(rowDest - rowPiece) == 2) {
-                        ((Pawn)this.tiles[rowDest, colDest]).setCapturableByEnpassent(true);
-                    }
-                    if (rowDest == 0) this.tiles[rowDest, colDest] = new Queen(Colour.DARK);
-                    if (rowDest == 7) this.tiles[rowDest, colDest] = new Queen(Colour.LIGHT);
+                    AfterMoveStateManager.updatePawnState(this.tiles, rowPiece, rowDest, colDest);
                     break;
                 case PieceType.ROOK:
+                    AfterMoveStateManager.updateRookState();
                     break;
                 case PieceType.KING:
+                    AfterMoveStateManager.updateKingState();
                     break;
             }
 

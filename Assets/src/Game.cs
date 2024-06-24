@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -38,6 +39,23 @@ namespace Assets.src {
                 int dest_row = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
 
                 if (hitList.Any(hit => hit.collider.CompareTag("MoveCollider"))) {
+                    // Handles enpassent capturing
+                    if (Math.Abs(piece_col - dest_col) == 1 && this.board.getPieceAt(piece_row, piece_col).getType() == PieceType.PAWN) {
+                        
+                        Collider2D[] colliders = new Collider2D[0];
+                        Collider2D targetCollider = new Collider2D();
+
+                        if (this.board.whiteTurn() && !hitList.Any(hit => hit.collider.CompareTag("BlackPiece"))) {
+                            colliders = Physics2D.OverlapBoxAll(new Vector2(dest_col, dest_row - 1), new Vector2(1, 1), 0);
+                            targetCollider = colliders.FirstOrDefault(c => c.CompareTag("BlackPiece"));
+                            if (targetCollider != null) Destroy(targetCollider.gameObject);
+                        } else if (!this.board.whiteTurn() && !hitList.Any(hit => hit.collider.CompareTag("WhitePiece"))) {
+                            colliders = Physics2D.OverlapBoxAll(new Vector2(dest_col, dest_row + 1), new Vector2(1, 1), 0);
+                            targetCollider = colliders.FirstOrDefault(c => c.CompareTag("WhitePiece"));
+                            if (targetCollider != null) Destroy(targetCollider.gameObject);
+                        }
+
+                    }
 
                     Destroy(hitList.First().collider.gameObject);
                     this.board.move(piece_row, piece_col, dest_row, dest_col);
@@ -80,7 +98,7 @@ namespace Assets.src {
                 GameObject objectCollider = new GameObject("moveCollider");
 
                 objectCollider.transform.position = new Vector3((float)move[1], (float)move[0], -0.5f);
-                objectCollider.transform.localScale = new Vector3(1f, 1f, 0);
+                objectCollider.transform.localScale = new Vector3(1f, 1f, 0f);
                 objectCollider.tag = "MoveCollider";
 
                 BoxCollider2D collider = objectCollider.AddComponent<BoxCollider2D>();

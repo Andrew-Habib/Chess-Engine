@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 // TODO - Pinned piece or in check
 
 namespace Assets.src {
