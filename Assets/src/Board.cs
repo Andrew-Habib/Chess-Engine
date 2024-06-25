@@ -121,6 +121,8 @@ namespace Assets.src {
 
         private void confirmMoveBoardStateManager(int rowPiece, int colPiece, int rowDest, int colDest) {
 
+            AfterMoveStateManager.updateBoardGeneral(this.tiles, this.isWhiteTurn);
+
             switch (this.tiles[rowDest, colDest].getType()) {
                 case PieceType.PAWN:
                     AfterMoveStateManager.updatePawnState(this.tiles, rowPiece, rowDest, colDest);
