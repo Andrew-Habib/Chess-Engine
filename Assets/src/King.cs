@@ -18,6 +18,14 @@
 
         public override int getValue() => (int) PieceType.KING;
 
+        public void revokeCastling() {
+            this.castlePrivelege = false;
+        }
+
+        public bool canCastle() {
+            return this.castlePrivelege;
+        }
+
     }
 
 }

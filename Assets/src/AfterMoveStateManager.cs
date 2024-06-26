@@ -39,12 +39,12 @@ namespace Assets.src {
 
         }
 
-        public static void updateRookState() {
-
+        public static void updateRookState(ChessPiece[,] tiles, int rowPiece, int colPiece) {
+            ((Rook)tiles[rowPiece, colPiece]).markAsMoved();
         }
 
-        public static void updateKingState() {
-
+        public static void updateKingState(ChessPiece[,] tiles, int rowPiece, int colPiece) {
+            ((King)tiles[rowPiece, colPiece]).revokeCastling();
         }
 
     }

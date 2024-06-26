@@ -125,10 +125,10 @@ namespace Assets.src {
                     AfterMoveStateManager.updatePawnState(this.tiles, this.isWhiteTurn, rowPiece, colPiece, rowDest, colDest);
                     break;
                 case PieceType.ROOK:
-                    AfterMoveStateManager.updateRookState();
+                    AfterMoveStateManager.updateRookState(this.tiles, rowPiece, colPiece);
                     break;
                 case PieceType.KING:
-                    AfterMoveStateManager.updateKingState();
+                    AfterMoveStateManager.updateKingState(this.tiles, rowPiece, colPiece);
                     break;
             }
 
