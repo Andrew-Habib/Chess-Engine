@@ -107,10 +107,7 @@ namespace Assets.src {
 
             foreach (int[] possible in legalMoves) {
                 if (rowDest == possible[0] && colDest == possible[1]) {
-                    this.tiles[rowDest, colDest] = this.tiles[rowPiece, colPiece];
-                    this.tiles[rowPiece, colPiece] = null;
                     this.confirmMoveBoardStateManager(rowPiece, colPiece, rowDest, colDest);
-                    this.isWhiteTurn = !this.isWhiteTurn;
                     return true;
                 }
             }
@@ -123,9 +120,9 @@ namespace Assets.src {
 
             AfterMoveStateManager.updateBoardGeneral(this.tiles, this.isWhiteTurn);
 
-            switch (this.tiles[rowDest, colDest].getType()) {
+            switch (this.tiles[rowPiece, colPiece].getType()) {
                 case PieceType.PAWN:
-                    AfterMoveStateManager.updatePawnState(this.tiles, rowPiece, rowDest, colDest);
+                    AfterMoveStateManager.updatePawnState(this.tiles, this.isWhiteTurn, rowPiece, colPiece, rowDest, colDest);
                     break;
                 case PieceType.ROOK:
                     AfterMoveStateManager.updateRookState();
@@ -134,6 +131,10 @@ namespace Assets.src {
                     AfterMoveStateManager.updateKingState();
                     break;
             }
+
+            this.tiles[rowDest, colDest] = this.tiles[rowPiece, colPiece];
+            this.tiles[rowPiece, colPiece] = null;
+            this.isWhiteTurn = !this.isWhiteTurn;
 
         }
 

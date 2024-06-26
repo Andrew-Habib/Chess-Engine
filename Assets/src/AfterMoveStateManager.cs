@@ -18,16 +18,24 @@ namespace Assets.src {
 
         }
 
-        public static void updatePawnState(ChessPiece[,] tiles, int rowPiece, int rowDest, int colDest) {
+        public static void updatePawnState(ChessPiece[,] tiles, bool isWhiteTurn, int rowPiece, int colPiece, int rowDest, int colDest) {
 
-            ((Pawn) tiles[rowDest, colDest]).markAsMoved();
+            ((Pawn) tiles[rowPiece, colPiece]).markAsMoved();
 
             if (Math.Abs(rowDest - rowPiece) == 2) {
-                ((Pawn)tiles[rowDest, colDest]).setCapturableByEnpassent(true);
+                ((Pawn)tiles[rowPiece, colPiece]).setCapturableByEnpassent(true);
             }
 
-            if (rowDest == 0) tiles[rowDest, colDest] = new Queen(Colour.DARK);
-            if (rowDest == 7) tiles[rowDest, colDest] = new Queen(Colour.LIGHT);
+            if (Math.Abs(colPiece - colDest) == 1 && tiles[rowPiece, colPiece].getType() == PieceType.PAWN 
+                && tiles[rowDest, colDest] == null) { // Enpassent manouver deleting enemy piece (Only move that requires extra deletion)
+                if (isWhiteTurn)
+                    tiles[rowDest - 1, colDest] = null;
+                else
+                    tiles[rowDest + 1, colDest] = null;
+            }
+
+            if (rowDest == 0) tiles[rowPiece, colPiece] = new Queen(Colour.DARK);
+            if (rowDest == 7) tiles[rowPiece, colPiece] = new Queen(Colour.LIGHT);
 
         }
 
