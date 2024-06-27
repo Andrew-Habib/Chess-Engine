@@ -39,11 +39,12 @@ namespace Assets.src {
                 int dest_row = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
 
                 if (hitList.Any(hit => hit.collider.CompareTag("MoveCollider"))) {
-                    // Handles enpassent capturing
-                    if (Math.Abs(piece_col - dest_col) == 1 && this.board.getPieceAt(piece_row, piece_col).getType() == PieceType.PAWN) {
-                        
-                        Collider2D[] colliders = new Collider2D[0];
-                        Collider2D targetCollider = new Collider2D();
+
+                    Collider2D[] colliders = new Collider2D[0];
+                    Collider2D targetCollider = new Collider2D();
+
+                    if (Math.Abs(piece_col - dest_col) == 1 && this.board.getPieceAt(piece_row, piece_col) != null &&
+                        this.board.getPieceAt(piece_row, piece_col).getType() == PieceType.PAWN) { // Enpassent
 
                         if (this.board.whiteTurn() && !hitList.Any(hit => hit.collider.CompareTag("BlackPiece"))) {
                             colliders = Physics2D.OverlapBoxAll(new Vector2(dest_col, dest_row - 1), new Vector2(1, 1), 0);
@@ -54,6 +55,20 @@ namespace Assets.src {
                             targetCollider = colliders.FirstOrDefault(c => c.CompareTag("WhitePiece"));
                             if (targetCollider != null) Destroy(targetCollider.gameObject);
                         }
+
+                    } else if (piece_col - dest_col == 2 && this.board.getPieceAt(dest_row, 0) != null &&
+                        this.board.getPieceAt(dest_row, 0).getType() == PieceType.ROOK) { // Queen-side castle
+
+                        colliders = Physics2D.OverlapBoxAll(new Vector2(0, dest_row), new Vector2(1, 1), 0);
+                        targetCollider = colliders.FirstOrDefault(c => c.CompareTag("WhitePiece") || c.CompareTag("BlackPiece"));
+                        if (targetCollider != null) targetCollider.transform.position = new Vector2(3, piece_row); // Rook to Queen square
+
+                    } else if (piece_col - dest_col == -2 && this.board.getPieceAt(dest_row, 7) != null &&
+                        this.board.getPieceAt(dest_row, 7).getType() == PieceType.ROOK) { // King-side castle
+
+                        colliders = Physics2D.OverlapBoxAll(new Vector2(7, dest_row), new Vector2(1, 1), 0);
+                        targetCollider = colliders.FirstOrDefault(c => c.CompareTag("WhitePiece") || c.CompareTag("BlackPiece"));
+                        if (targetCollider != null) targetCollider.transform.position = new Vector2(5, piece_row); // Rook to King's bishop square
 
                     }
 

@@ -22,7 +22,7 @@ namespace Assets.src {
 
             ((Pawn) tiles[rowPiece, colPiece]).markAsMoved();
 
-            if (Math.Abs(rowDest - rowPiece) == 2) {
+            if (Math.Abs(rowDest - rowPiece) == 2) { // Check for pawn moving 2 spaces up in one turn
                 ((Pawn)tiles[rowPiece, colPiece]).setCapturableByEnpassent(true);
             }
 
@@ -43,8 +43,18 @@ namespace Assets.src {
             ((Rook)tiles[rowPiece, colPiece]).markAsMoved();
         }
 
-        public static void updateKingState(ChessPiece[,] tiles, int rowPiece, int colPiece) {
+        public static void updateKingState(ChessPiece[,] tiles, int rowPiece, int colPiece, int rowDest, int colDest) {
+
             ((King)tiles[rowPiece, colPiece]).revokeCastling();
+
+            if (colPiece - colDest == 2 && tiles[rowDest, 0] != null && tiles[rowDest, 0].getType() == PieceType.ROOK) { // Check for Queen-side castling
+                tiles[rowDest, 3] = tiles[rowPiece, 0];
+                tiles[rowPiece, 0] = null;
+            } else if (colPiece - colDest == -2 && tiles[rowDest, 7] != null && tiles[rowDest, 7].getType() == PieceType.ROOK) { // Check for King-side castling
+                tiles[rowDest, 5] = tiles[rowPiece, 7];
+                tiles[rowPiece, 7] = null;
+            }
+
         }
 
     }

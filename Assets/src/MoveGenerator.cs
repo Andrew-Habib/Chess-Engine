@@ -182,15 +182,15 @@ namespace Assets.src {
 
             // Check for ability to queen-side castle
             // King can castle, Rook is present, Rook has not moved, and all squares between the Queen's rook and the king are empty
-            if (((King)piece).canCastle() && board[row, 0].getType() == PieceType.ROOK && !((Rook) board[row, 0]).hasMoved()
-                && board[row, 1] == null && board[row, 2] == null && board[row, 3] == null) {
+            if (((King)piece).canCastle() && board[row, 0] != null && board[row, 0].getType() == PieceType.ROOK 
+                && !((Rook) board[row, 0]).hasMoved() && board[row, 1] == null && board[row, 2] == null && board[row, 3] == null) {
                 moves.Add(new int[] { row, 2 });
             }
 
             // Check for ability to king-side castle
             // King can castle, Rook is present, Rook has not moved, and all squares between the King's rook and the king are empty
-            if (((King)piece).canCastle() && board[row, 7].getType() == PieceType.ROOK && !((Rook)board[row, 7]).hasMoved()
-                && board[row, 5] == null && board[row, 6] == null) {
+            if (((King)piece).canCastle() && board[row, 7] != null && board[row, 7].getType() == PieceType.ROOK 
+                && !((Rook)board[row, 7]).hasMoved() && board[row, 5] == null && board[row, 6] == null) {
                 moves.Add(new int[] { row, 6 });
             }
 

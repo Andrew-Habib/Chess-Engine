@@ -128,7 +128,7 @@ namespace Assets.src {
                     AfterMoveStateManager.updateRookState(this.tiles, rowPiece, colPiece);
                     break;
                 case PieceType.KING:
-                    AfterMoveStateManager.updateKingState(this.tiles, rowPiece, colPiece);
+                    AfterMoveStateManager.updateKingState(this.tiles, rowPiece, colPiece, rowDest, colDest);
                     break;
             }
 
