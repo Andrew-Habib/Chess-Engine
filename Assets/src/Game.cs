@@ -9,6 +9,8 @@ namespace Assets.src {
         private Board board;
         
         public Sprite moveGenerate;
+        public Sprite whiteQueen;
+        public Sprite blackQueen;
 
         private GameObject pieceSelected = null;
         private int piece_row = -1;
@@ -42,9 +44,9 @@ namespace Assets.src {
 
                     Collider2D[] colliders = new Collider2D[0];
                     Collider2D targetCollider = new Collider2D();
+                    SpriteRenderer spriteRenderer = this.pieceSelected.GetComponent<SpriteRenderer>();
 
-                    if (Math.Abs(piece_col - dest_col) == 1 && this.board.getPieceAt(piece_row, piece_col) != null &&
-                        this.board.getPieceAt(piece_row, piece_col).getType() == PieceType.PAWN) { // Enpassent
+                    if (Math.Abs(piece_col - dest_col) == 1 && ChessTools.getPieceType(this.board.getChessPieces(), piece_row, piece_col) == PieceType.PAWN) { // Enpassent
 
                         if (this.board.whiteTurn() && !hitList.Any(hit => hit.collider.CompareTag("BlackPiece"))) {
                             colliders = Physics2D.OverlapBoxAll(new Vector2(dest_col, dest_row - 1), new Vector2(1, 1), 0);
@@ -56,15 +58,21 @@ namespace Assets.src {
                             if (targetCollider != null) Destroy(targetCollider.gameObject);
                         }
 
-                    } else if (piece_col - dest_col == 2 && this.board.getPieceAt(dest_row, 0) != null &&
-                        this.board.getPieceAt(dest_row, 0).getType() == PieceType.ROOK) { // Queen-side castle
+                    } else if (dest_row == 0 && ChessTools.getPieceType(this.board.getChessPieces(), piece_row, piece_col) == PieceType.PAWN) { // Black Pawn Promotes to Queen
+
+                        spriteRenderer.sprite = blackQueen;
+
+                    } else if (dest_row == 7 && ChessTools.getPieceType(this.board.getChessPieces(), piece_row, piece_col) == PieceType.PAWN) { // White Pawn Promotes to Queen
+
+                        spriteRenderer.sprite = whiteQueen;
+
+                    } else if (piece_col - dest_col == 2 && ChessTools.getPieceType(this.board.getChessPieces(), dest_row, 0) == PieceType.ROOK) { // Queen-side castle
 
                         colliders = Physics2D.OverlapBoxAll(new Vector2(0, dest_row), new Vector2(1, 1), 0);
                         targetCollider = colliders.FirstOrDefault(c => c.CompareTag("WhitePiece") || c.CompareTag("BlackPiece"));
                         if (targetCollider != null) targetCollider.transform.position = new Vector2(3, piece_row); // Rook to Queen square
 
-                    } else if (piece_col - dest_col == -2 && this.board.getPieceAt(dest_row, 7) != null &&
-                        this.board.getPieceAt(dest_row, 7).getType() == PieceType.ROOK) { // King-side castle
+                    } else if (piece_col - dest_col == -2 && ChessTools.getPieceType(this.board.getChessPieces(), dest_row, 7) == PieceType.ROOK) { // King-side castle
 
                         colliders = Physics2D.OverlapBoxAll(new Vector2(7, dest_row), new Vector2(1, 1), 0);
                         targetCollider = colliders.FirstOrDefault(c => c.CompareTag("WhitePiece") || c.CompareTag("BlackPiece"));

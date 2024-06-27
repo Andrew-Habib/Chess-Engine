@@ -1850,6 +1850,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveGenerate: {fileID: 1777830949972533610, guid: 24238b2af4193294191887f4d854348c, type: 3}
+  whiteQueen: {fileID: -6506523755981211861, guid: 746b6d39b22804840974b94a57468934, type: 3}
+  blackQueen: {fileID: 5726476272086295759, guid: b4016d4c775416b40b59561b36d532c6, type: 3}
 --- !u!1 &532847353
 GameObject:
   m_ObjectHideFlags: 0

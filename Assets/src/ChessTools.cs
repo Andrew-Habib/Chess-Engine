@@ -13,6 +13,14 @@
             return board[r, c] == null;
         }
 
+        public static PieceType? getPieceType(ChessPiece[,] board, int r, int c) {
+            if (board[r, c] == null) {
+                return null;
+            } else {
+                return board[r, c].getType();
+            }
+        }
+
         public static bool teamAtDestination(ChessPiece piece, ChessPiece[,] board, int r, int c) {
             return piece != null && !emptyTile(board, r, c) && piece.getColour() == board[r, c].getColour();
         }

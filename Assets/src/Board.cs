@@ -65,6 +65,10 @@ namespace Assets.src {
             return this.tiles[row, col];
         }
 
+        public ChessPiece[,] getChessPieces() {
+            return this.tiles;
+        }
+
         public bool whiteTurn() {
             return this.isWhiteTurn;
         }

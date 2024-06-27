@@ -20,22 +20,18 @@ namespace Assets.src {
             }
 
             // Capturing Opposing Pieces Diagonally Forward
-            if (ChessTools.inbounds(row + dir, col - 1) &&
-                ChessTools.enemyAtDestination(piece, board, row + dir, col - 1))
+            if (ChessTools.inbounds(row + dir, col - 1) && ChessTools.enemyAtDestination(piece, board, row + dir, col - 1))
                 moves.Add(new int[] { row + dir, col - 1 }); 
-            if (ChessTools.inbounds(row + dir, col + 1) &&
-                ChessTools.enemyAtDestination(piece, board, row + dir, col + 1))
+            if (ChessTools.inbounds(row + dir, col + 1) && ChessTools.enemyAtDestination(piece, board, row + dir, col + 1))
                 moves.Add(new int[] { row + dir, col + 1 });
 
             // Capturing Opposing Pieces with enpassent left and right
-            if (ChessTools.inbounds(row, col - 1) &&
-                ChessTools.enemyAtDestination(piece, board, row, col - 1) && 
-                ((Pawn)board[row, col - 1]).isCapturableByEnpassent()) {
+            if (ChessTools.inbounds(row, col - 1) && ChessTools.enemyAtDestination(piece, board, row, col - 1) && 
+                ChessTools.getPieceType(board, row, col - 1) == PieceType.PAWN && ((Pawn)board[row, col - 1]).isCapturableByEnpassent()) {
                 moves.Add(new int[] { row + dir, col - 1 });
             }
-            if (ChessTools.inbounds(row, col + 1) &&
-                ChessTools.enemyAtDestination(piece, board, row, col + 1) &&
-                ((Pawn)board[row, col + 1]).isCapturableByEnpassent()) {
+            if (ChessTools.inbounds(row, col + 1) && ChessTools.enemyAtDestination(piece, board, row, col + 1) &&
+                ChessTools.getPieceType(board, row, col + 1) == PieceType.PAWN && ((Pawn)board[row, col + 1]).isCapturableByEnpassent()) {
                 moves.Add(new int[] { row + dir, col + 1 });
             }
 

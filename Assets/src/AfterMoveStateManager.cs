@@ -47,10 +47,10 @@ namespace Assets.src {
 
             ((King)tiles[rowPiece, colPiece]).revokeCastling();
 
-            if (colPiece - colDest == 2 && tiles[rowDest, 0] != null && tiles[rowDest, 0].getType() == PieceType.ROOK) { // Check for Queen-side castling
+            if (colPiece - colDest == 2 && ChessTools.getPieceType(tiles, rowDest, 0) == PieceType.ROOK) { // Check for Queen-side castling
                 tiles[rowDest, 3] = tiles[rowPiece, 0];
                 tiles[rowPiece, 0] = null;
-            } else if (colPiece - colDest == -2 && tiles[rowDest, 7] != null && tiles[rowDest, 7].getType() == PieceType.ROOK) { // Check for King-side castling
+            } else if (colPiece - colDest == -2 && ChessTools.getPieceType(tiles, rowDest, 7) == PieceType.ROOK) { // Check for King-side castling
                 tiles[rowDest, 5] = tiles[rowPiece, 7];
                 tiles[rowPiece, 7] = null;
             }
