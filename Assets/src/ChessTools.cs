@@ -21,6 +21,15 @@
             }
         }
 
+        public static bool isCurrentPlayerPiece(ChessPiece[,] board, int r, int c, bool isWhiteTurn) {
+            if (board[r, c] == null) {
+                return false;
+            } else {
+                return (isWhiteTurn && board[r, c].getColour() == Colour.LIGHT) ||
+                        (!isWhiteTurn && board[r, c].getColour() == Colour.DARK);
+            }
+        }
+
         public static bool teamAtDestination(ChessPiece piece, ChessPiece[,] board, int r, int c) {
             return piece != null && !emptyTile(board, r, c) && piece.getColour() == board[r, c].getColour();
         }

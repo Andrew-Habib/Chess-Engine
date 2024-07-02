@@ -26,11 +26,15 @@
             return this.castlePrivelege;
         }
 
-        public void checkKing(bool check) {
-            this.inCheck = check;
+        public void unCheckKing() {
+            this.inCheck = false;
         }
 
-        public bool check() {
+        public void checkKing() {
+            this.inCheck = true;
+        }
+
+        public bool isInCheck() {
             return this.inCheck;
         }
 

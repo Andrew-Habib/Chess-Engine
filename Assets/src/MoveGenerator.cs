@@ -9,8 +9,7 @@ namespace Assets.src {
 
             List<int[]> moves = new List<int[]>();
 
-            if ((whiteTurn && piece.getColour() == Colour.LIGHT) ^
-                   (!whiteTurn && piece.getColour() == Colour.DARK)) {
+            if (piece != null && ChessTools.isCurrentPlayerPiece(board, row, col, whiteTurn)) {
                 switch (piece.getType()) {
                     case PieceType.PAWN:
                         moves = generatePawnMoves(piece, row, col, board, whiteTurn);

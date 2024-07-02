@@ -1,19 +1,42 @@
 ﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+// King checked - iterate through all opposing pieces moves then check if the king is at any of those locations
+// King danger zone - iterate through all opposing pieces moves then 
+// updateBoardGeneral handles enpassent resets and checks
 
 namespace Assets.src {
     static class AfterMoveStateManager {
 
-        public static void updateBoardGeneral(ChessPiece[,] tiles, bool isWhiteTurn) {
+        public static void updateBoardGeneral(ChessPiece[,] tiles, bool isWhiteTurn, List<int[]> dangerSquares) {
 
-            for (int row = 0; row < tiles.GetLength(0); row++) { // Enpassent resets for opposition after move is made
+            dangerSquares = new List<int[]>();
+
+            for (int row = 0; row < tiles.GetLength(0); row++) {
                 for (int col = 0; col < tiles.GetLength(1); col++) {
-                    if (ChessTools.getPieceType(tiles, row, col) == PieceType.PAWN &&
-                        ((isWhiteTurn && tiles[row, col].getColour() == Colour.DARK) ||
-                        (!isWhiteTurn && tiles[row, col].getColour() == Colour.LIGHT))) {
+
+                    if (ChessTools.isCurrentPlayerPiece(tiles, row, col, isWhiteTurn)){ // Handle current player pieces
+                        dangerSquares.AddRange(MoveGenerator.generateMovesAbstract(tiles[row, col], row, col, tiles, isWhiteTurn));
+                        if (ChessTools.getPieceType(tiles, row, col) == PieceType.KING) {
+                            ((King)tiles[row, col]).unCheckKing();
+                        }
+                    }
+
+                    if (ChessTools.isCurrentPlayerPiece(tiles, row, col, !isWhiteTurn) &&
+                        ChessTools.getPieceType(tiles, row, col) == PieceType.PAWN) { // Handle opposing player pieces
                         ((Pawn)tiles[row, col]).setCapturableByEnpassent(false);
                     }
+
                 } 
-                
+            }
+
+            foreach (int[] square in dangerSquares) {
+                if (ChessTools.getPieceType(tiles, square[0], square[1]) == PieceType.KING) {
+                    ((King)tiles[square[0], square[1]]).checkKing();
+                    Debug.Log("Check");
+                    break;
+                }
             }
 
         }

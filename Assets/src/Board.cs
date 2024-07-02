@@ -7,11 +7,13 @@ namespace Assets.src {
 
         private ChessPiece[,] tiles;
         private bool isWhiteTurn;
+        private List<int[]> dangerSquares;
 
         public Board() {
 
             this.tiles = new ChessPiece[8, 8];
             this.isWhiteTurn = true;
+            this.dangerSquares = new List<int[]>();
 
         }
 
@@ -101,8 +103,6 @@ namespace Assets.src {
 
         private void confirmMoveBoardStateManager(int rowPiece, int colPiece, int rowDest, int colDest) {
 
-            AfterMoveStateManager.updateBoardGeneral(this.tiles, this.isWhiteTurn);
-
             switch (this.tiles[rowPiece, colPiece].getType()) {
                 case PieceType.PAWN:
                     AfterMoveStateManager.updatePawnState(this.tiles, this.isWhiteTurn, rowPiece, colPiece, rowDest, colDest);
@@ -117,6 +117,7 @@ namespace Assets.src {
 
             this.tiles[rowDest, colDest] = this.tiles[rowPiece, colPiece];
             this.tiles[rowPiece, colPiece] = null;
+            AfterMoveStateManager.updateBoardGeneral(this.tiles, this.isWhiteTurn, this.dangerSquares);
             this.isWhiteTurn = !this.isWhiteTurn;
 
         }
