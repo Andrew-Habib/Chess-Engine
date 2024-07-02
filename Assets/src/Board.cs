@@ -76,29 +76,8 @@ namespace Assets.src {
         public List<int[]> generateLegalMoves(int row, int col) {
 
             if (this.getPieceAt(row, col) != null) {
-
                 ChessPiece pieceSelected = this.getPieceAt(row, col);
-
-                if ((this.isWhiteTurn && pieceSelected.getColour() == Colour.LIGHT) ^
-                    (!this.isWhiteTurn && pieceSelected.getColour() == Colour.DARK)) {
-                    switch (pieceSelected.getType()) {
-                        case PieceType.PAWN: 
-                            return MoveGenerator.generatePawnMoves(pieceSelected, row, col, this.tiles, this.isWhiteTurn); 
-                        case PieceType.KNIGHT:
-                            return MoveGenerator.generateKnightMoves(pieceSelected, row, col, this.tiles, this.isWhiteTurn); 
-                        case PieceType.BISHOP:
-                            return MoveGenerator.generateBishopMoves(pieceSelected, row, col, this.tiles, this.isWhiteTurn); 
-                        case PieceType.ROOK:
-                            return MoveGenerator.generateRookMoves(pieceSelected, row, col, this.tiles, this.isWhiteTurn); 
-                        case PieceType.QUEEN:
-                            return MoveGenerator.generateQueenMoves(pieceSelected, row, col, this.tiles, this.isWhiteTurn); 
-                        case PieceType.KING:
-                            return MoveGenerator.generateKingMoves(pieceSelected, row, col, this.tiles, this.isWhiteTurn); 
-                        default:
-                            return new List<int[]>();
-                    }
-                }
-
+                return MoveGenerator.generateMovesAbstract(pieceSelected, row, col, tiles, isWhiteTurn);
             }
 
             return new List<int[]>();

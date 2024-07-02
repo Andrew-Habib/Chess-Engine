@@ -26,6 +26,14 @@
             return this.castlePrivelege;
         }
 
+        public void checkKing(bool check) {
+            this.inCheck = check;
+        }
+
+        public bool check() {
+            return this.inCheck;
+        }
+
     }
 
 }

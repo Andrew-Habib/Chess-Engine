@@ -7,13 +7,13 @@ namespace Assets.src {
 
             for (int row = 0; row < tiles.GetLength(0); row++) { // Enpassent resets for opposition after move is made
                 for (int col = 0; col < tiles.GetLength(1); col++) {
-                    if (tiles[row, col] != null && tiles[row, col].getType() == PieceType.PAWN) { 
-                        if ((isWhiteTurn && tiles[row, col].getColour() == Colour.DARK) ||
-                            (!isWhiteTurn && tiles[row, col].getColour() == Colour.LIGHT)) {
-                            ((Pawn)tiles[row, col]).setCapturableByEnpassent(false);
-                        }
+                    if (ChessTools.getPieceType(tiles, row, col) == PieceType.PAWN &&
+                        ((isWhiteTurn && tiles[row, col].getColour() == Colour.DARK) ||
+                        (!isWhiteTurn && tiles[row, col].getColour() == Colour.LIGHT))) {
+                        ((Pawn)tiles[row, col]).setCapturableByEnpassent(false);
                     }
-                }
+                } 
+                
             }
 
         }

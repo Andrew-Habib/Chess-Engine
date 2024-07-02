@@ -5,6 +5,41 @@ namespace Assets.src {
 
     static class MoveGenerator {
 
+        public static List<int[]> generateMovesAbstract(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn) {
+
+            List<int[]> moves = new List<int[]>();
+
+            if ((whiteTurn && piece.getColour() == Colour.LIGHT) ^
+                   (!whiteTurn && piece.getColour() == Colour.DARK)) {
+                switch (piece.getType()) {
+                    case PieceType.PAWN:
+                        moves = generatePawnMoves(piece, row, col, board, whiteTurn);
+                        break;
+                    case PieceType.KNIGHT:
+                        moves = generateKnightMoves(piece, row, col, board, whiteTurn);
+                        break;
+                    case PieceType.BISHOP:
+                        moves = generateBishopMoves(piece, row, col, board, whiteTurn);
+                        break;
+                    case PieceType.ROOK:
+                        moves = generateRookMoves(piece, row, col, board, whiteTurn);
+                        break;
+                    case PieceType.QUEEN:
+                        moves = generateQueenMoves(piece, row, col, board, whiteTurn);
+                        break; 
+                    case PieceType.KING:
+                        moves = generateKingMoves(piece, row, col, board, whiteTurn);
+                        break;
+                    default:
+                        moves = new List<int[]>();
+                        break;
+                }
+            }
+
+            return moves;
+
+        }
+
         public static List<int[]> generatePawnMoves(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn) {
 
             List<int[]> moves = new List<int[]>();
