@@ -25,7 +25,7 @@ namespace Assets.src {
                             if (ChessTools.inbounds(row + dir, col + 1))
                                 dangerSquares.Add(new int[] { row + dir, col + 1 });
                         } else {
-                            dangerSquares.AddRange(MoveGenerator.generateMovesAbstract(tiles[row, col], row, col, tiles, isWhiteTurn, dangerSquares));
+                            dangerSquares.AddRange(MoveGenerator.generateMovesAbstract(tiles, row, col, isWhiteTurn, dangerSquares, true));
                         }
 
                         if (ChessTools.getPieceType(tiles, row, col) == PieceType.KING) { // Reset King Checks

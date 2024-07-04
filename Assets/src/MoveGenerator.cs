@@ -1,34 +1,35 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 // TODO - Pinned piece or in check
+// Generate Danger version for move generator
 
 namespace Assets.src {
 
     static class MoveGenerator {
 
-        public static List<int[]> generateMovesAbstract(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn, List<int[]> dangerSquares) {
+        public static List<int[]> generateMovesAbstract(ChessPiece[,] board, int row, int col, bool whiteTurn, List<int[]> dangerSquares, bool genDangerMode) {
 
+            ChessPiece piece = board[row, col];
             List<int[]> moves = new List<int[]>();
 
             if (piece != null && ChessTools.isCurrentPlayerPiece(board, row, col, whiteTurn)) {
                 switch (piece.getType()) {
                     case PieceType.PAWN:
-                        moves = generatePawnMoves(piece, row, col, board, whiteTurn);
+                        moves = generatePawnMoves(board, row, col, whiteTurn, genDangerMode);
                         break;
                     case PieceType.KNIGHT:
-                        moves = generateKnightMoves(piece, row, col, board, whiteTurn);
+                        moves = generateKnightMoves(board, row, col, whiteTurn, genDangerMode);
                         break;
                     case PieceType.BISHOP:
-                        moves = generateBishopMoves(piece, row, col, board, whiteTurn);
+                        moves = generateBishopMoves(board, row, col, whiteTurn, genDangerMode);
                         break;
                     case PieceType.ROOK:
-                        moves = generateRookMoves(piece, row, col, board, whiteTurn);
+                        moves = generateRookMoves(board, row, col, whiteTurn, genDangerMode);
                         break;
                     case PieceType.QUEEN:
-                        moves = generateQueenMoves(piece, row, col, board, whiteTurn);
+                        moves = generateQueenMoves(board, row, col, whiteTurn, genDangerMode);
                         break; 
                     case PieceType.KING:
-                        moves = generateKingMoves(piece, row, col, board, whiteTurn, dangerSquares);
+                        moves = generateKingMoves(board, row, col, whiteTurn, dangerSquares, genDangerMode);
                         break;
                     default:
                         moves = new List<int[]>();
@@ -40,8 +41,9 @@ namespace Assets.src {
 
         }
 
-        public static List<int[]> generatePawnMoves(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn) {
+        public static List<int[]> generatePawnMoves(ChessPiece[,] board, int row, int col, bool whiteTurn, bool genDangerMode) {
 
+            ChessPiece piece = board[row, col];
             List<int[]> moves = new List<int[]>();
 
             int dir = whiteTurn ? 1 : -1;
@@ -55,9 +57,9 @@ namespace Assets.src {
             }
 
             // Capturing Opposing Pieces Diagonally Forward
-            if (ChessTools.inbounds(row + dir, col - 1) && ChessTools.enemyAtDestination(piece, board, row + dir, col - 1))
+            if (ChessTools.inbounds(row + dir, col - 1) && (ChessTools.enemyAtDestination(piece, board, row + dir, col - 1) || genDangerMode))
                 moves.Add(new int[] { row + dir, col - 1 }); 
-            if (ChessTools.inbounds(row + dir, col + 1) && ChessTools.enemyAtDestination(piece, board, row + dir, col + 1))
+            if (ChessTools.inbounds(row + dir, col + 1) && (ChessTools.enemyAtDestination(piece, board, row + dir, col + 1) || genDangerMode))
                 moves.Add(new int[] { row + dir, col + 1 });
 
             // Capturing Opposing Pieces with enpassent left and right
@@ -74,8 +76,9 @@ namespace Assets.src {
 
         }
 
-        public static List<int[]> generateKnightMoves(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn) {
+        public static List<int[]> generateKnightMoves(ChessPiece[,] board, int row, int col, bool whiteTurn, bool genDangerMode) {
 
+            ChessPiece piece = board[row, col];
             List<int[]> moves = new List<int[]>();
 
             (int, int)[] knightHopCombos =
@@ -98,7 +101,7 @@ namespace Assets.src {
                 if (ChessTools.inbounds(possibleRow, possibleCol)) { // Check if knight hop in bounds of chess board
                     // Check if the possible hop location does not contain a team piece - VALID square condition
                     if (ChessTools.emptyTile(board, possibleRow, possibleCol) || 
-                        ChessTools.enemyAtDestination(piece, board, possibleRow, possibleCol)) {
+                        ChessTools.enemyAtDestination(piece, board, possibleRow, possibleCol) || genDangerMode) {
                         moves.Add(new int[] { possibleRow, possibleCol });
                     }
                 }
@@ -109,8 +112,9 @@ namespace Assets.src {
 
         }
 
-        public static List<int[]> generateSlidingMoves(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn, (int, int)[] dirs) {
-            
+        public static List<int[]> generateSlidingMoves(ChessPiece[,] board, int row, int col, bool whiteTurn, bool genDangerMode, (int, int)[] dirs) {
+
+            ChessPiece piece = board[row, col];
             List<int[]> moves = new List<int[]>();
 
             (int, int)[] directions = dirs;
@@ -124,7 +128,7 @@ namespace Assets.src {
 
                     if (ChessTools.emptyTile(board, newRow, newCol)) {
                         moves.Add(new int[] { newRow, newCol });
-                    } else if (ChessTools.enemyAtDestination(piece, board, newRow, newCol)) {
+                    } else if (ChessTools.enemyAtDestination(piece, board, newRow, newCol) || genDangerMode) {
                         moves.Add(new int[] { newRow, newCol });
                         break;
                     } else {
@@ -139,7 +143,7 @@ namespace Assets.src {
 
         }
 
-        public static List<int[]> generateBishopMoves(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn) {
+        public static List<int[]> generateBishopMoves(ChessPiece[,] board, int row, int col, bool whiteTurn, bool genDangerMode) {
 
             (int, int)[] bishopDirections =
             {
@@ -149,13 +153,13 @@ namespace Assets.src {
                 (1, 1)
             };
 
-            List<int[]> moves = generateSlidingMoves(piece, row, col, board, whiteTurn, bishopDirections);
+            List<int[]> moves = generateSlidingMoves(board, row, col, whiteTurn, genDangerMode, bishopDirections);
 
             return moves;
 
         }
 
-        public static List<int[]> generateRookMoves(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn) {
+        public static List<int[]> generateRookMoves(ChessPiece[,] board, int row, int col, bool whiteTurn, bool genDangerMode) {
 
             (int, int)[] rookDirections =
             {
@@ -165,25 +169,26 @@ namespace Assets.src {
                 (1, 0)
             };
 
-            List<int[]> moves = generateSlidingMoves(piece, row, col, board, whiteTurn, rookDirections);
+            List<int[]> moves = generateSlidingMoves(board, row, col, whiteTurn, genDangerMode, rookDirections);
 
             return moves;
 
         }
 
-        public static List<int[]> generateQueenMoves(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn) {
+        public static List<int[]> generateQueenMoves(ChessPiece[,] board, int row, int col, bool whiteTurn, bool genDangerMode) {
             // Queen moves are combination of Rook and Bishop Moves - Union of Two Sets
             List<int[]> moves = new List<int[]>();
 
-            moves.AddRange(generateBishopMoves(piece, row, col, board, whiteTurn));
-            moves.AddRange(generateRookMoves(piece, row, col, board, whiteTurn));
+            moves.AddRange(generateBishopMoves(board, row, col, whiteTurn, genDangerMode));
+            moves.AddRange(generateRookMoves(board, row, col, whiteTurn, genDangerMode));
 
             return moves;
 
         }
 
-        public static List<int[]> generateKingMoves(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn, List<int[]> dangerSquares) {
+        public static List<int[]> generateKingMoves(ChessPiece[,] board, int row, int col, bool whiteTurn, List<int[]> dangerSquares, bool genDangerMode) {
 
+            ChessPiece piece = board[row, col];
             List<int[]> moves = new List<int[]>();
 
             (int, int)[] kingDirections =
@@ -203,9 +208,8 @@ namespace Assets.src {
                 int newRow = row + dir.Item1;
                 int newCol = col + dir.Item2;
 
-                if (ChessTools.inbounds(newRow, newCol) &&
-                    (ChessTools.emptyTile(board, newRow, newCol) || 
-                    ChessTools.enemyAtDestination(piece, board, newRow, newCol))) {
+                if (ChessTools.inbounds(newRow, newCol) && (ChessTools.emptyTile(board, newRow, newCol) || 
+                    ChessTools.enemyAtDestination(piece, board, newRow, newCol) || genDangerMode)) {
                     moves.Add(new int[] { newRow, newCol });
                 } 
 

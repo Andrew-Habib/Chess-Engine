@@ -79,7 +79,7 @@ namespace Assets.src {
 
             if (this.getPieceAt(row, col) != null) {
                 ChessPiece pieceSelected = this.getPieceAt(row, col);
-                return MoveGenerator.generateMovesAbstract(pieceSelected, row, col, tiles, isWhiteTurn, dangerSquares);
+                return MoveGenerator.generateMovesAbstract(tiles, row, col, isWhiteTurn, dangerSquares, false);
             }
 
             return new List<int[]>();
