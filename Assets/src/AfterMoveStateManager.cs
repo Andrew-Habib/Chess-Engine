@@ -11,13 +11,13 @@ namespace Assets.src {
 
         public static void updateBoardGeneral(ChessPiece[,] tiles, bool isWhiteTurn, List<int[]> dangerSquares) {
 
-            dangerSquares = new List<int[]>();
+            dangerSquares.Clear();
 
             for (int row = 0; row < tiles.GetLength(0); row++) {
                 for (int col = 0; col < tiles.GetLength(1); col++) {
 
                     if (ChessTools.isCurrentPlayerPiece(tiles, row, col, isWhiteTurn)){ // Handle current player pieces
-                        dangerSquares.AddRange(MoveGenerator.generateMovesAbstract(tiles[row, col], row, col, tiles, isWhiteTurn));
+                        dangerSquares.AddRange(MoveGenerator.generateMovesAbstract(tiles[row, col], row, col, tiles, isWhiteTurn, dangerSquares));
                         if (ChessTools.getPieceType(tiles, row, col) == PieceType.KING) {
                             ((King)tiles[row, col]).unCheckKing();
                         }

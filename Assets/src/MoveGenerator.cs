@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 // TODO - Pinned piece or in check
 
 namespace Assets.src {
 
     static class MoveGenerator {
 
-        public static List<int[]> generateMovesAbstract(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn) {
+        public static List<int[]> generateMovesAbstract(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn, List<int[]> dangerSquares) {
 
             List<int[]> moves = new List<int[]>();
 
@@ -27,7 +28,7 @@ namespace Assets.src {
                         moves = generateQueenMoves(piece, row, col, board, whiteTurn);
                         break; 
                     case PieceType.KING:
-                        moves = generateKingMoves(piece, row, col, board, whiteTurn);
+                        moves = generateKingMoves(piece, row, col, board, whiteTurn, dangerSquares);
                         break;
                     default:
                         moves = new List<int[]>();
@@ -181,7 +182,7 @@ namespace Assets.src {
 
         }
 
-        public static List<int[]> generateKingMoves(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn) {
+        public static List<int[]> generateKingMoves(ChessPiece piece, int row, int col, ChessPiece[,] board, bool whiteTurn, List<int[]> dangerSquares) {
 
             List<int[]> moves = new List<int[]>();
 
@@ -210,18 +211,31 @@ namespace Assets.src {
 
             }
 
-            // Check for ability to queen-side castle
-            // King can castle, Rook is present, Rook has not moved, and all squares between the Queen's rook and the king are empty
-            if (((King)piece).canCastle() && board[row, 0] != null && board[row, 0].getType() == PieceType.ROOK 
-                && !((Rook) board[row, 0]).hasMoved() && board[row, 1] == null && board[row, 2] == null && board[row, 3] == null) {
-                moves.Add(new int[] { row, 2 });
+            if (((King)piece).canCastle() && !((King)piece).isInCheck()) {
+
+                // Check for ability to queen-side castle
+                // King can castle, Rook is present, Rook has not moved, and all squares between the Queen's rook and the king are empty
+                if ((ChessTools.getPieceType(board, row, 0) == PieceType.ROOK && 
+                    !((Rook) board[row, 0]).hasMoved() && board[row, 1] == null && board[row, 2] == null && board[row, 3] == null)) {
+                    moves.Add(new int[] { row, 2 });
+                }
+
+                // Check for ability to king-side castle
+                // King can castle, Rook is present, Rook has not moved, and all squares between the King's rook and the king are empty
+                if ((ChessTools.getPieceType(board, row, 7) == PieceType.ROOK &&
+                    !((Rook)board[row, 7]).hasMoved() && board[row, 5] == null && board[row, 6] == null)) {
+                    moves.Add(new int[] { row, 6 });
+                }
+
             }
 
-            // Check for ability to king-side castle
-            // King can castle, Rook is present, Rook has not moved, and all squares between the King's rook and the king are empty
-            if (((King)piece).canCastle() && board[row, 7] != null && board[row, 7].getType() == PieceType.ROOK 
-                && !((Rook)board[row, 7]).hasMoved() && board[row, 5] == null && board[row, 6] == null) {
-                moves.Add(new int[] { row, 6 });
+            for (int i = moves.Count - 1; i >= 0; i--) { // Limit King movement using danger zones by enemy pieces
+                foreach (int[] square in dangerSquares) {
+                    if (moves[i][0] == square[0] && moves[i][1] == square[1]) {
+                        moves.RemoveAt(i);
+                        break;
+                    }
+                }
             }
 
             return moves;

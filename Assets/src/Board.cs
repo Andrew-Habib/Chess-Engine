@@ -79,7 +79,7 @@ namespace Assets.src {
 
             if (this.getPieceAt(row, col) != null) {
                 ChessPiece pieceSelected = this.getPieceAt(row, col);
-                return MoveGenerator.generateMovesAbstract(pieceSelected, row, col, tiles, isWhiteTurn);
+                return MoveGenerator.generateMovesAbstract(pieceSelected, row, col, tiles, isWhiteTurn, dangerSquares);
             }
 
             return new List<int[]>();
@@ -92,7 +92,7 @@ namespace Assets.src {
 
             foreach (int[] possible in legalMoves) {
                 if (rowDest == possible[0] && colDest == possible[1]) {
-                    this.confirmMoveBoardStateManager(rowPiece, colPiece, rowDest, colDest);
+                    this.confirmMoveBoardStateManager(rowPiece, colPiece, rowDest, colDest);                    
                     return true;
                 }
             }
