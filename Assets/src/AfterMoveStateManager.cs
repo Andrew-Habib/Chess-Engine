@@ -17,10 +17,23 @@ namespace Assets.src {
                 for (int col = 0; col < tiles.GetLength(1); col++) {
 
                     if (ChessTools.isCurrentPlayerPiece(tiles, row, col, isWhiteTurn)){ // Handle current player pieces
-                        dangerSquares.AddRange(MoveGenerator.generateMovesAbstract(tiles[row, col], row, col, tiles, isWhiteTurn, dangerSquares));
-                        if (ChessTools.getPieceType(tiles, row, col) == PieceType.KING) {
-                            ((King)tiles[row, col]).unCheckKing();
+
+                        if (ChessTools.getPieceType(tiles, row, col) == PieceType.PAWN) {
+                            int dir = isWhiteTurn ? 1 : -1;
+                            if (ChessTools.inbounds(row + dir, col - 1))
+                                dangerSquares.Add(new int[] { row + dir, col - 1 });
+                            if (ChessTools.inbounds(row + dir, col + 1))
+                                dangerSquares.Add(new int[] { row + dir, col + 1 });
+                        } else {
+                            dangerSquares.AddRange(MoveGenerator.generateMovesAbstract(tiles[row, col], row, col, tiles, isWhiteTurn, dangerSquares));
                         }
+
+                        if (ChessTools.getPieceType(tiles, row, col) == PieceType.KING) { // Reset King Checks
+
+                            ((King)tiles[row, col]).unCheckKing();
+
+                        } 
+
                     }
 
                     if (ChessTools.isCurrentPlayerPiece(tiles, row, col, !isWhiteTurn) &&
