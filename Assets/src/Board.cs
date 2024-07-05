@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 namespace Assets.src {
@@ -7,13 +6,11 @@ namespace Assets.src {
 
         private ChessPiece[,] tiles;
         private bool isWhiteTurn;
-        private List<int[]> dangerSquares;
 
         public Board() {
 
             this.tiles = new ChessPiece[8, 8];
             this.isWhiteTurn = true;
-            this.dangerSquares = new List<int[]>();
 
         }
 
@@ -78,8 +75,7 @@ namespace Assets.src {
         public List<int[]> generateLegalMoves(int row, int col) {
 
             if (this.getPieceAt(row, col) != null) {
-                ChessPiece pieceSelected = this.getPieceAt(row, col);
-                return MoveGenerator.generateMovesAbstract(tiles, row, col, isWhiteTurn, dangerSquares, false);
+                return MoveGenerator.generateMovesAbstract(tiles, row, col, isWhiteTurn, false);
             }
 
             return new List<int[]>();
@@ -117,7 +113,7 @@ namespace Assets.src {
 
             this.tiles[rowDest, colDest] = this.tiles[rowPiece, colPiece];
             this.tiles[rowPiece, colPiece] = null;
-            AfterMoveStateManager.updateBoardGeneral(this.tiles, this.isWhiteTurn, this.dangerSquares);
+            AfterMoveStateManager.updateBoardGeneral(this.tiles, this.isWhiteTurn);
             this.isWhiteTurn = !this.isWhiteTurn;
 
         }

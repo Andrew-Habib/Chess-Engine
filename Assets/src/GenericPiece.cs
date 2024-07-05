@@ -1,4 +1,6 @@
-﻿namespace Assets.src {
+﻿using System;
+
+namespace Assets.src {
 
     public abstract class GenericPiece : ChessPiece {
 
