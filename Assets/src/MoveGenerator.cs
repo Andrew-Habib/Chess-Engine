@@ -1,4 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+
+// Fix castle prevention on check
+// Ensure that the King cannot perform a castle if danger zone is between
 
 namespace Assets.src {
 
@@ -16,7 +20,7 @@ namespace Assets.src {
                     PieceType.BISHOP => generateBishopMoves(board, row, col),
                     PieceType.ROOK => generateRookMoves(board, row, col),
                     PieceType.QUEEN => generateQueenMoves(board, row, col),
-                    PieceType.KING => generateKingMoves(board, row, col),
+                    PieceType.KING => generateKingMoves(board, row, col, whiteTurn),
                     _ => new List<int[]>(),
                 };
                 if (!genDangerMode) {
@@ -28,33 +32,58 @@ namespace Assets.src {
 
         }
 
-        private static void adjustGeneratedMoves(ChessPiece[,] board, int row, int col, List<int[]> moves, bool whiteTurn) {
+        public static List<int[]> allPlayerMoves(ChessPiece[,] board, bool whiteTurn, bool nonAdjusted) {
 
+            List<int[]> possibleMoves = new List<int[]>();
+
+            for (int r = 0; r < board.GetLength(0); r++) {
+                for (int c = 0; c < board.GetLength(1); c++) {
+                    if (ChessTools.isCurrentPlayerPiece(board, r, c, whiteTurn)) {
+                        possibleMoves.AddRange(generateMovesAbstract(board, r, c, whiteTurn, nonAdjusted));
+                    }
+                }
+            }
+
+            return possibleMoves;
+
+        }
+
+        private static void adjustGeneratedMoves(ChessPiece[,] board, int row, int col, List<int[]> moves, bool whiteTurn) {
+            // Adjusted moves king danger zones
             List<int[]> dangerZones = new List<int[]>();
 
             for (int i = moves.Count - 1; i >= 0; i--) {
+
                 int possible_row = moves[i][0];
                 int possible_col = moves[i][1];
                 ChessPiece takenPiece = board[possible_row, possible_col];
                 board[possible_row, possible_col] = board[row, col];
                 board[row, col] = null;
+
                 dangerZones.Clear();
-                for (int r = 0; r < board.GetLength(0); r++) {
-                    for (int c = 0; c < board.GetLength(1); c++) {
-                        if (ChessTools.isCurrentPlayerPiece(board, r, c, !whiteTurn)) { // Handle current player pieces
-                            dangerZones.AddRange(generateMovesAbstract(board, r, c, !whiteTurn, true));
-                        }
-                    }
-                }
+                dangerZones = allPlayerMoves(board, !whiteTurn, true);
+
                 foreach (int[] zone in dangerZones) {
                     if (ChessTools.getPieceType(board, zone[0], zone[1]) == PieceType.KING) {
-                        ((King)board[zone[0], zone[1]]).checkKing();
+                        King king = (King)board[zone[0], zone[1]];
                         moves.RemoveAt(i);
+                        if (king.canCastle() && !king.isInCheck()) {
+                            if (row == zone[0] && zone[1] == 3) {
+                                int indexToRemove = moves.FindIndex(item => item.SequenceEqual(new int[] { row, 2 }));
+                                if (indexToRemove >= 0) moves.RemoveAt(indexToRemove);
+                            } else if (row == zone[0] && zone[1] == 5) {
+                                int indexToRemove = moves.FindIndex(item => item.SequenceEqual(new int[] { row, 6 }));
+                                if (indexToRemove >= 0) moves.RemoveAt(indexToRemove);
+                            }   
+                        }   
                     }
                 }
+
                 board[row, col] = board[possible_row, possible_col];
                 board[possible_row, possible_col] = takenPiece;
+
             }
+
         }
 
         private static List<int[]> generatePawnMoves(ChessPiece[,] board, int row, int col, bool whiteTurn) {
@@ -202,7 +231,7 @@ namespace Assets.src {
 
         }
 
-        private static List<int[]> generateKingMoves(ChessPiece[,] board, int row, int col) {
+        private static List<int[]> generateKingMoves(ChessPiece[,] board, int row, int col, bool whiteTurn) {
 
             ChessPiece piece = board[row, col];
             List<int[]> moves = new List<int[]>();
