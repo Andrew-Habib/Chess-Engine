@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-// Fix castle prevention on check
-// Ensure that the King cannot perform a castle if danger zone is between
+// Rare Bug - Some King moves not generating
 
 namespace Assets.src {
 
@@ -49,33 +48,44 @@ namespace Assets.src {
         }
 
         private static void adjustGeneratedMoves(ChessPiece[,] board, int row, int col, List<int[]> moves, bool whiteTurn) {
-            // Adjusted moves king danger zones
+            // Adjusted based on pins, checks, danger zones, etc.
             List<int[]> dangerZones = new List<int[]>();
+            List<int> indicesToRemove = new List<int>();
 
             for (int i = moves.Count - 1; i >= 0; i--) {
-
+                
                 int possible_row = moves[i][0];
                 int possible_col = moves[i][1];
                 ChessPiece takenPiece = board[possible_row, possible_col];
                 board[possible_row, possible_col] = board[row, col];
                 board[row, col] = null;
 
+                indicesToRemove.Clear();
                 dangerZones.Clear();
                 dangerZones = allPlayerMoves(board, !whiteTurn, true);
 
                 foreach (int[] zone in dangerZones) {
                     if (ChessTools.getPieceType(board, zone[0], zone[1]) == PieceType.KING) {
                         King king = (King)board[zone[0], zone[1]];
-                        moves.RemoveAt(i);
+                        indicesToRemove.Add(i);
                         if (king.canCastle() && !king.isInCheck()) {
                             if (row == zone[0] && zone[1] == 3) {
                                 int indexToRemove = moves.FindIndex(item => item.SequenceEqual(new int[] { row, 2 }));
-                                if (indexToRemove >= 0) moves.RemoveAt(indexToRemove);
+                                if (indexToRemove >= 0) indicesToRemove.Add(indexToRemove);
                             } else if (row == zone[0] && zone[1] == 5) {
                                 int indexToRemove = moves.FindIndex(item => item.SequenceEqual(new int[] { row, 6 }));
-                                if (indexToRemove >= 0) moves.RemoveAt(indexToRemove);
+                                if (indexToRemove >= 0) indicesToRemove.Add(indexToRemove);
                             }   
                         }   
+                    }
+                }
+
+                indicesToRemove.Sort();
+                indicesToRemove.Reverse();
+
+                foreach (int index in indicesToRemove) {
+                    if (index >= 0 && index < moves.Count) {
+                        moves.RemoveAt(index);
                     }
                 }
 
