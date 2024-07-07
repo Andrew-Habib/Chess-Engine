@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 // Rare Bug - Some King moves not generating
 
@@ -60,8 +61,6 @@ namespace Assets.src {
                 board[possible_row, possible_col] = board[row, col];
                 board[row, col] = null;
 
-                indicesToRemove.Clear();
-                dangerZones.Clear();
                 dangerZones = allPlayerMoves(board, !whiteTurn, true);
 
                 foreach (int[] zone in dangerZones) {
@@ -75,8 +74,9 @@ namespace Assets.src {
                             } else if (row == zone[0] && zone[1] == 5) {
                                 int indexToRemove = moves.FindIndex(item => item.SequenceEqual(new int[] { row, 6 }));
                                 if (indexToRemove >= 0) indicesToRemove.Add(indexToRemove);
-                            }   
-                        }   
+                            }
+                        }
+                        break;
                     }
                 }
 
@@ -88,6 +88,9 @@ namespace Assets.src {
                         moves.RemoveAt(index);
                     }
                 }
+
+                indicesToRemove.Clear();
+                dangerZones.Clear();
 
                 board[row, col] = board[possible_row, possible_col];
                 board[possible_row, possible_col] = takenPiece;

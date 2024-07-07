@@ -6,11 +6,15 @@ namespace Assets.src {
 
         private ChessPiece[,] tiles;
         private bool isWhiteTurn;
+        private King whiteKing;
+        private King blackKing;
 
         public Board() {
 
             this.tiles = new ChessPiece[8, 8];
             this.isWhiteTurn = true;
+            this.whiteKing = new King(Colour.LIGHT);
+            this.blackKing = new King(Colour.DARK);
 
         }
 
@@ -29,7 +33,7 @@ namespace Assets.src {
                         } else if (j == 3) {
                             this.tiles[i, j] = new Queen(Colour.LIGHT);
                         } else if (j == 4) {
-                            this.tiles[i, j] = new King(Colour.LIGHT);
+                            this.tiles[i, j] = this.whiteKing;
                         } else {
                             this.tiles[i, j] = null;
                         }
@@ -47,7 +51,7 @@ namespace Assets.src {
                         } else if (j == 3) {
                             this.tiles[i, j] = new Queen(Colour.DARK);
                         } else if (j == 4) {
-                            this.tiles[i, j] = new King(Colour.DARK);
+                            this.tiles[i, j] = this.blackKing;
                         } else {
                             this.tiles[i, j] = null;
                         }
@@ -60,17 +64,15 @@ namespace Assets.src {
 
         }
 
-        public ChessPiece getPieceAt(int row, int col) {
-            return this.tiles[row, col];
-        }
+        public ChessPiece getPieceAt(int row, int col) => this.tiles[row, col];
 
-        public ChessPiece[,] getChessPieces() {
-            return this.tiles;
-        }
+        public ChessPiece[,] getChessPieces() => this.tiles;
 
-        public bool whiteTurn() {
-            return this.isWhiteTurn;
-        }
+        public bool whiteTurn() => this.isWhiteTurn;
+
+        public King getWhiteKing() => this.whiteKing;
+
+        public King getBlackKing() => this.blackKing;
 
         public List<int[]> generateLegalMoves(int row, int col) {
 
