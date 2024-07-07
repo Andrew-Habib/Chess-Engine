@@ -37,7 +37,7 @@ namespace Assets.src {
                 if (hitList.Any(hit => hit.collider.CompareTag("MoveCollider"))) {
 
                     Collider2D[] colliders = new Collider2D[0];
-                    Collider2D targetCollider = new Collider2D();
+                    Collider2D targetCollider = new();
                     SpriteRenderer spriteRenderer = pieceSelected.GetComponent<SpriteRenderer>();
 
                     switch(ChessTools.getPieceType(board.getChessPieces(), piece_row, piece_col)) {
@@ -95,6 +95,7 @@ namespace Assets.src {
                     pieceSelected.transform.position = new Vector3(dest_col, dest_row, -1f);
                     removeAllMoveSprites();
                     resetPieceSelection();
+                    Debug.Log(board.getResult());
 
                 } else if (hitList.Any(hit => hit.collider.CompareTag("WhitePiece")) ||
                     hitList.Any(hit => hit.collider.CompareTag("BlackPiece"))) {
@@ -120,7 +121,7 @@ namespace Assets.src {
 
             foreach (var move in board.generateLegalMoves(piece_row, piece_col)) {
                 
-                GameObject imageObject = new GameObject("moveGen");
+                GameObject imageObject = new("moveGen");
                 SpriteRenderer spriteRenderer = imageObject.AddComponent<SpriteRenderer>();
                 spriteRenderer.sprite = moveGenerate;
 
@@ -128,7 +129,7 @@ namespace Assets.src {
                 imageObject.transform.localScale = new Vector3(0.15f, 0.15f, 0);
                 imageObject.tag = "Move";
 
-                GameObject objectCollider = new GameObject("moveCollider");
+                GameObject objectCollider = new("moveCollider");
 
                 objectCollider.transform.position = new Vector3((float)move[1], (float)move[0], -0.5f);
                 objectCollider.transform.localScale = new Vector3(1f, 1f, 0f);

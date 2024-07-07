@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// King checked - iterate through all opposing pieces moves then check if the king is at any of those locations
-// King danger zone - iterate through all opposing pieces moves then 
-// updateBoardGeneral handles enpassent resets and checks
+// { false, false} - Game Proceeds
+// { true, false} - White wins
+// { false, true} - Black wins
+// { true, true } - Draw
 
 namespace Assets.src {
     static class AfterMoveStateManager {
 
-        public static void updateBoardGeneral(ChessPiece[,] tiles, bool isWhiteTurn) {
+        public static bool[] updateBoardGeneral(ChessPiece[,] tiles, bool isWhiteTurn, int hashCode,
+            Dictionary<int, int> hashPosWhiteTurn, Dictionary<int, int> hashPosBlackTurn) {
 
             List<int[]> currPlayerMoves = MoveGenerator.allPlayerMoves(tiles, isWhiteTurn, false);
             List<int[]> opposingMoves = MoveGenerator.allPlayerMoves(tiles, !isWhiteTurn, false);
@@ -22,11 +24,13 @@ namespace Assets.src {
                         ((King)tiles[zone[0], zone[1]]).mateKing();
                         if (isWhiteTurn) {
                             Debug.Log("White wins the Game by Checkmate!");
+                            return new bool[] { true, false };
                         } else {
                             Debug.Log("Black wins the Game by Checkmate!");
+                            return new bool[] { true, false };
                         }   
                     }
-                    return;
+                    return new bool[] { false, false };
                 }
             }
 
@@ -45,7 +49,7 @@ namespace Assets.src {
                             if (opposingMoves.Count == 0) { // Can be made more efficient with King ref
                                 ((King)tiles[row, col]).mateKing();
                                 Debug.Log("The Game is a Draw to Stalemate!");
-                                return;
+                                return new bool[] { true, true };
                             }
                         } else if (ChessTools.getPieceType(tiles, row, col) == PieceType.PAWN) {
                             ((Pawn)tiles[row, col]).setCapturableByEnpassent(false);
@@ -56,6 +60,26 @@ namespace Assets.src {
                 } 
             }
 
+            bool threefold;
+            if (isWhiteTurn)
+                threefold = checkThreeFoldRepetition(hashCode, hashPosWhiteTurn);
+            else
+                threefold = checkThreeFoldRepetition(hashCode, hashPosBlackTurn);
+
+            return new bool[] { threefold, threefold };
+            
+        }
+
+        private static bool checkThreeFoldRepetition(int hashCode, Dictionary<int, int> hashListPos) {
+            if (!hashListPos.ContainsKey(hashCode)) {
+                hashListPos[hashCode] = 0;
+            }
+            hashListPos[hashCode]++;
+
+            if (hashListPos[hashCode] >= 3)
+                Debug.Log("Three-fold");
+
+            return hashListPos[hashCode] >= 3;
         }
 
         public static void updatePawnState(ChessPiece[,] tiles, bool isWhiteTurn, int rowPiece, int colPiece, int rowDest, int colDest) {

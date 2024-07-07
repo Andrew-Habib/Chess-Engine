@@ -4,17 +4,23 @@ using System.Collections.Generic;
 namespace Assets.src {
     class Board {
 
-        private ChessPiece[,] tiles;
+        private readonly ChessPiece[,] tiles;
         private bool isWhiteTurn;
-        private King whiteKing;
-        private King blackKing;
+        private bool[] gameResult;
+        private readonly King whiteKing;
+        private readonly King blackKing;
+        private readonly Dictionary<int, int> hashPosWhiteTurn;
+        private readonly Dictionary<int, int> hashPosBlackTurn;
 
         public Board() {
 
             tiles = new ChessPiece[8, 8];
             isWhiteTurn = true;
+            gameResult = new bool[] { false, false };
             whiteKing = new King(Colour.LIGHT);
             blackKing = new King(Colour.DARK);
+            hashPosWhiteTurn = new Dictionary<int, int>();
+            hashPosBlackTurn = new Dictionary<int, int>();
 
         }
 
@@ -62,6 +68,8 @@ namespace Assets.src {
                 }
             }
 
+
+
         }
 
         public ChessPiece getPieceAt(int row, int col) => tiles[row, col];
@@ -80,6 +88,9 @@ namespace Assets.src {
 
         public bool move(int rowPiece, int colPiece, int rowDest, int colDest) {
 
+            if (gameResult.Length == 2 && (gameResult[0] == true || gameResult[1] == true))
+                return false;
+
             List<int[]> legalMoves = generateLegalMoves(rowPiece, colPiece);
 
             foreach (int[] possible in legalMoves) {
@@ -95,7 +106,7 @@ namespace Assets.src {
 
         private void confirmMoveBoardStateManager(int rowPiece, int colPiece, int rowDest, int colDest) {
 
-            switch (tiles[rowPiece, colPiece].getType()) {
+            switch (ChessTools.getPieceType(tiles, rowPiece, colPiece)) {
                 case PieceType.PAWN:
                     AfterMoveStateManager.updatePawnState(tiles, isWhiteTurn, rowPiece, colPiece, rowDest, colDest);
                     break;
@@ -109,9 +120,37 @@ namespace Assets.src {
 
             tiles[rowDest, colDest] = tiles[rowPiece, colPiece];
             tiles[rowPiece, colPiece] = null;
-            AfterMoveStateManager.updateBoardGeneral(tiles, isWhiteTurn);
+            gameResult = AfterMoveStateManager.updateBoardGeneral(tiles, isWhiteTurn, GetHashCode(), hashPosWhiteTurn, hashPosBlackTurn);
             isWhiteTurn = !isWhiteTurn;
 
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                int hash = 17;
+
+                foreach (ChessPiece piece in tiles) {
+                    if (piece != null) {
+                        hash = hash * 31 + piece.GetHashCode();
+                    } else {
+                        hash = hash * 31;
+                    }
+                }
+
+                return hash;
+            }
+        }
+
+        public string getResult() {
+            if (gameResult.Length != 2 || (gameResult[0] == false && gameResult[1] == false)) {
+                return "Active Game!";
+            } else if (gameResult[0] == true && gameResult[1] == false) {
+                return "White wins!";
+            } else if (gameResult[0] == false && gameResult[1] == true) {
+                return "Black wins!";
+            } else {
+                return "White and Black Draw!";
+            }
         }
 
         public void PrintBoardState() {
