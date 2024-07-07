@@ -19,14 +19,8 @@ namespace Assets.src {
         // Start is called before the first frame update
         void Start() {
 
-            this.board = new Board();
-            this.board.initChessBoard();
-
-            //// Debugging - Checks Move Generators on the Unity Environment
-            //for (int i = 0; i < this.board.generateLegalMoves(0, 1).Count; i++) {
-            //    int[] array = this.board.generateLegalMoves(0, 1)[i];
-            //    Debug.Log($"Array {i + 1}: " + array[0] + " " + array[1]);
-            //}
+            board = new Board();
+            board.initChessBoard();
 
         }
 
@@ -44,9 +38,9 @@ namespace Assets.src {
 
                     Collider2D[] colliders = new Collider2D[0];
                     Collider2D targetCollider = new Collider2D();
-                    SpriteRenderer spriteRenderer = this.pieceSelected.GetComponent<SpriteRenderer>();
+                    SpriteRenderer spriteRenderer = pieceSelected.GetComponent<SpriteRenderer>();
 
-                    switch(ChessTools.getPieceType(this.board.getChessPieces(), piece_row, piece_col)) {
+                    switch(ChessTools.getPieceType(board.getChessPieces(), piece_row, piece_col)) {
 
                         case PieceType.PAWN:
 
@@ -60,11 +54,11 @@ namespace Assets.src {
 
                             } else if (Math.Abs(piece_col - dest_col) == 1) { // Enpassent
 
-                                if (this.board.whiteTurn() && !hitList.Any(hit => hit.collider.CompareTag("BlackPiece"))) {
+                                if (board.whiteTurn() && !hitList.Any(hit => hit.collider.CompareTag("BlackPiece"))) {
                                     colliders = Physics2D.OverlapBoxAll(new Vector2(dest_col, dest_row - 1), new Vector2(1, 1), 0);
                                     targetCollider = colliders.FirstOrDefault(c => c.CompareTag("BlackPiece"));
                                     if (targetCollider != null) Destroy(targetCollider.gameObject);
-                                } else if (!this.board.whiteTurn() && !hitList.Any(hit => hit.collider.CompareTag("WhitePiece"))) {
+                                } else if (!board.whiteTurn() && !hitList.Any(hit => hit.collider.CompareTag("WhitePiece"))) {
                                     colliders = Physics2D.OverlapBoxAll(new Vector2(dest_col, dest_row + 1), new Vector2(1, 1), 0);
                                     targetCollider = colliders.FirstOrDefault(c => c.CompareTag("WhitePiece"));
                                     if (targetCollider != null) Destroy(targetCollider.gameObject);
@@ -76,14 +70,14 @@ namespace Assets.src {
                         case PieceType.KING:
 
                             if (piece_col - dest_col == 2 && 
-                                ChessTools.getPieceType(this.board.getChessPieces(), dest_row, 0) == PieceType.ROOK) { // Queen-side castle
+                                ChessTools.getPieceType(board.getChessPieces(), dest_row, 0) == PieceType.ROOK) { // Queen-side castle
 
                                 colliders = Physics2D.OverlapBoxAll(new Vector2(0, dest_row), new Vector2(1, 1), 0);
                                 targetCollider = colliders.FirstOrDefault(c => c.CompareTag("WhitePiece") || c.CompareTag("BlackPiece"));
                                 if (targetCollider != null) targetCollider.transform.position = new Vector2(3, piece_row); // Rook to Queen square
 
                             } else if (piece_col - dest_col == -2 && 
-                                ChessTools.getPieceType(this.board.getChessPieces(), dest_row, 7) == PieceType.ROOK) { // King-side castle
+                                ChessTools.getPieceType(board.getChessPieces(), dest_row, 7) == PieceType.ROOK) { // King-side castle
 
                                 colliders = Physics2D.OverlapBoxAll(new Vector2(7, dest_row), new Vector2(1, 1), 0);
                                 targetCollider = colliders.FirstOrDefault(c => c.CompareTag("WhitePiece") || c.CompareTag("BlackPiece"));
@@ -97,25 +91,25 @@ namespace Assets.src {
                      
 
                     Destroy(hitList.First().collider.gameObject);
-                    this.board.move(piece_row, piece_col, dest_row, dest_col);
-                    this.pieceSelected.transform.position = new Vector3(dest_col, dest_row, -1f);
-                    this.removeAllMoveSprites();
-                    this.resetPieceSelection();
+                    board.move(piece_row, piece_col, dest_row, dest_col);
+                    pieceSelected.transform.position = new Vector3(dest_col, dest_row, -1f);
+                    removeAllMoveSprites();
+                    resetPieceSelection();
 
                 } else if (hitList.Any(hit => hit.collider.CompareTag("WhitePiece")) ||
                     hitList.Any(hit => hit.collider.CompareTag("BlackPiece"))) {
 
-                    this.removeAllMoveSprites();
-                    this.resetPieceSelection();
-                    this.pieceSelected = hitList.First().collider.gameObject;
-                    this.piece_col = dest_col;
-                    this.piece_row = dest_row;
-                    this.generateMoveSprites();
+                    removeAllMoveSprites();
+                    resetPieceSelection();
+                    pieceSelected = hitList.First().collider.gameObject;
+                    piece_col = dest_col;
+                    piece_row = dest_row;
+                    generateMoveSprites();
 
                 } else {
 
-                    this.removeAllMoveSprites();
-                    this.resetPieceSelection();
+                    removeAllMoveSprites();
+                    resetPieceSelection();
 
                 }
             }
@@ -124,7 +118,7 @@ namespace Assets.src {
 
         void generateMoveSprites() {
 
-            foreach (var move in this.board.generateLegalMoves(piece_row, piece_col)) {
+            foreach (var move in board.generateLegalMoves(piece_row, piece_col)) {
                 
                 GameObject imageObject = new GameObject("moveGen");
                 SpriteRenderer spriteRenderer = imageObject.AddComponent<SpriteRenderer>();
@@ -157,9 +151,9 @@ namespace Assets.src {
         }
 
         void resetPieceSelection() {
-            this.pieceSelected = null;
-            this.piece_row = -1;
-            this.piece_col = -1;
+            pieceSelected = null;
+            piece_row = -1;
+            piece_col = -1;
         }
 
     }

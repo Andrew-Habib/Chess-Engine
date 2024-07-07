@@ -13,7 +13,7 @@
         public abstract int getValue();
 
         public Colour getColour() {
-            return this.colour;
+            return colour;
         }
 
     }

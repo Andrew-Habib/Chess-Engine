@@ -6,8 +6,8 @@
         private bool capturableEnpassent;
 
         public Pawn(Colour colour) : base(colour) {
-            this.moved = false;
-            this.capturableEnpassent = false;
+            moved = false;
+            capturableEnpassent = false;
         }
 
         public override PieceType getType() => PieceType.PAWN;
@@ -15,19 +15,19 @@
         public override int getValue() => (int) PieceType.PAWN;
 
         public void markAsMoved() {
-            this.moved = true;
+            moved = true;
         }
 
         public void setCapturableByEnpassent(bool capturable) {
-            this.capturableEnpassent = capturable;
+            capturableEnpassent = capturable;
         }
 
         public bool hasMoved() {
-            return this.moved;
+            return moved;
         }
 
         public bool isCapturableByEnpassent() {
-            return this.capturableEnpassent;
+            return capturableEnpassent;
         }
 
     }

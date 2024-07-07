@@ -8,10 +8,10 @@
         private bool stalemated;
 
         public King(Colour colour) : base(colour) {
-            this.castlePrivelege = true;
-            this.inCheck = false;
-            this.checkmated = false;
-            this.stalemated = false;
+            castlePrivelege = true;
+            inCheck = false;
+            checkmated = false;
+            stalemated = false;
         }
 
         public override PieceType getType() => PieceType.KING;
@@ -19,33 +19,33 @@
         public override int getValue() => (int) PieceType.KING;
 
         public void resetKingStates() {
-            this.castlePrivelege = true;
-            this.inCheck = false;
-            this.checkmated = false;
-            this.stalemated = false;
+            castlePrivelege = true;
+            inCheck = false;
+            checkmated = false;
+            stalemated = false;
         }
 
-        public void revokeCastling() => this.castlePrivelege = false;
+        public void revokeCastling() => castlePrivelege = false;
 
-        public bool canCastle() => this.castlePrivelege;
+        public bool canCastle() => castlePrivelege;
 
-        public void unCheckKing() => this.inCheck = false;
+        public void unCheckKing() => inCheck = false;
 
-        public void checkKing() => this.inCheck = true;
+        public void checkKing() => inCheck = true;
 
-        public bool isInCheck() => this.inCheck;
+        public bool isInCheck() => inCheck;
 
         public void mateKing() {
-            if (this.inCheck) {
-                this.checkmated = true;
+            if (inCheck) {
+                checkmated = true;
             } else {
-                this.stalemated = true;
+                stalemated = true;
             }
         }
 
-        public bool isCheckMated() => this.checkmated;
+        public bool isCheckMated() => checkmated;
 
-        public bool isStaleMated() => this.stalemated;
+        public bool isStaleMated() => stalemated;
 
     }
 

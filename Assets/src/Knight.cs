@@ -2,9 +2,7 @@
 
     public class Knight : GenericPiece {
 
-        public Knight(Colour colour) : base(colour) {
-            this.colour = colour;
-        }
+        public Knight(Colour colour) : base(colour) {}
 
         public override PieceType getType() => PieceType.KNIGHT;
 

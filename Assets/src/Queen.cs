@@ -2,8 +2,7 @@
 
     public class Queen : GenericPiece {
 
-        public Queen(Colour colour) : base(colour) {
-        }
+        public Queen(Colour colour) : base(colour) {}
 
         public override PieceType getType() => PieceType.QUEEN;
 

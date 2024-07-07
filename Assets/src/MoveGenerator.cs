@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-
-// Rare Bug - Some King moves not generating
 
 namespace Assets.src {
 
@@ -10,17 +7,19 @@ namespace Assets.src {
 
         public static List<int[]> generateMovesAbstract(ChessPiece[,] board, int row, int col, bool whiteTurn, bool genDangerMode) {
 
-            ChessPiece piece = board[row, col];
-            List<int[]> moves = new List<int[]>();
+            if (!ChessTools.inbounds(row, col)) return new List<int[]>();
 
-            if (piece != null && ChessTools.isCurrentPlayerPiece(board, row, col, whiteTurn)) {
+            ChessPiece piece = board[row, col];
+            List<int[]> moves = new();
+
+            if (ChessTools.isCurrentPlayerPiece(board, row, col, whiteTurn)) {
                 moves = piece.getType() switch {
                     PieceType.PAWN => generatePawnMoves(board, row, col, whiteTurn),
                     PieceType.KNIGHT => generateKnightMoves(board, row, col),
                     PieceType.BISHOP => generateBishopMoves(board, row, col),
                     PieceType.ROOK => generateRookMoves(board, row, col),
                     PieceType.QUEEN => generateQueenMoves(board, row, col),
-                    PieceType.KING => generateKingMoves(board, row, col, whiteTurn),
+                    PieceType.KING => generateKingMoves(board, row, col),
                     _ => new List<int[]>(),
                 };
                 if (!genDangerMode) {
@@ -34,7 +33,7 @@ namespace Assets.src {
 
         public static List<int[]> allPlayerMoves(ChessPiece[,] board, bool whiteTurn, bool nonAdjusted) {
 
-            List<int[]> possibleMoves = new List<int[]>();
+            List<int[]> possibleMoves = new();
 
             for (int r = 0; r < board.GetLength(0); r++) {
                 for (int c = 0; c < board.GetLength(1); c++) {
@@ -50,8 +49,8 @@ namespace Assets.src {
 
         private static void adjustGeneratedMoves(ChessPiece[,] board, int row, int col, List<int[]> moves, bool whiteTurn) {
             // Adjusted based on pins, checks, danger zones, etc.
-            List<int[]> dangerZones = new List<int[]>();
-            List<int> indicesToRemove = new List<int>();
+            List<int[]> dangerZones = new();
+            List<int> indicesToRemove = new();
 
             for (int i = moves.Count - 1; i >= 0; i--) {
                 
@@ -102,7 +101,7 @@ namespace Assets.src {
         private static List<int[]> generatePawnMoves(ChessPiece[,] board, int row, int col, bool whiteTurn) {
 
             ChessPiece piece = board[row, col];
-            List<int[]> moves = new List<int[]>();
+            List<int[]> moves = new();
 
             int dir = whiteTurn ? 1 : -1;
 
@@ -137,7 +136,7 @@ namespace Assets.src {
         private static List<int[]> generateKnightMoves(ChessPiece[,] board, int row, int col) {
 
             ChessPiece piece = board[row, col];
-            List<int[]> moves = new List<int[]>();
+            List<int[]> moves = new();
 
             (int, int)[] knightHopCombos =
             {
@@ -173,7 +172,7 @@ namespace Assets.src {
         private static List<int[]> generateSlidingMoves(ChessPiece[,] board, int row, int col, (int, int)[] dirs) {
 
             ChessPiece piece = board[row, col];
-            List<int[]> moves = new List<int[]>();
+            List<int[]> moves = new();
 
             (int, int)[] directions = dirs;
 
@@ -235,7 +234,7 @@ namespace Assets.src {
 
         private static List<int[]> generateQueenMoves(ChessPiece[,] board, int row, int col) {
             // Queen moves are combination of Rook and Bishop Moves - Union of Two Sets
-            List<int[]> moves = new List<int[]>();
+            List<int[]> moves = new();
 
             moves.AddRange(generateBishopMoves(board, row, col));
             moves.AddRange(generateRookMoves(board, row, col));
@@ -244,10 +243,10 @@ namespace Assets.src {
 
         }
 
-        private static List<int[]> generateKingMoves(ChessPiece[,] board, int row, int col, bool whiteTurn) {
+        private static List<int[]> generateKingMoves(ChessPiece[,] board, int row, int col) {
 
             ChessPiece piece = board[row, col];
-            List<int[]> moves = new List<int[]>();
+            List<int[]> moves = new();
 
             (int, int)[] kingDirections =
             {
