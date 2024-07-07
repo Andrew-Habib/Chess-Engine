@@ -3,5 +3,7 @@
         PieceType getType();
         int getValue();
         Colour getColour();
+        bool Equals(object obj);
+        int GetHashCode();
     }
 }

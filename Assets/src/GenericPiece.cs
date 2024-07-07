@@ -16,6 +16,18 @@
             return colour;
         }
 
+        public override bool Equals(object obj) {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            GenericPiece other = (GenericPiece)obj;
+            return colour == other.colour;
+        }
+
+        public override int GetHashCode() {
+            return colour.GetHashCode();
+        }
+
     }
 
 }
