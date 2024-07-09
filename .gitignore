@@ -70,3 +70,14 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# NUnit specific entries
+[Tt]ests/bin/
+[Tt]ests/obj/
+*.xml
+*.trx
+
+# NUnit, NUnit3TestAdapter, Microsoft.NET.Test.Sdk
+[Nn]Unit/
+[Nn]Unit3[TestAdapter]/
+Microsoft.NET.Test.Sdk/
