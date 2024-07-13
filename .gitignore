@@ -84,3 +84,4 @@ Microsoft.NET.Test.Sdk/
 
 # Ignore .pgn chess files
 *.pgn
+*.pgn.meta
