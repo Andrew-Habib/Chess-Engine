@@ -9,6 +9,7 @@ namespace Assets.src {
         private bool[] gameResult;
         private readonly King whiteKing;
         private readonly King blackKing;
+        private int movesInARowNoCapture;
         private readonly Dictionary<int, int> hashPosWhiteTurn;
         private readonly Dictionary<int, int> hashPosBlackTurn;
 
@@ -19,6 +20,7 @@ namespace Assets.src {
             gameResult = new bool[] { false, false };
             whiteKing = new King(Colour.LIGHT);
             blackKing = new King(Colour.DARK);
+            movesInARowNoCapture = 0;
             hashPosWhiteTurn = new Dictionary<int, int>();
             hashPosBlackTurn = new Dictionary<int, int>();
 
@@ -83,7 +85,7 @@ namespace Assets.src {
         public King getBlackKing() => blackKing;
 
         public List<int[]> generateLegalMoves(int row, int col) {
-            return MoveGenerator.generateMovesAbstract(tiles, row, col, isWhiteTurn, false);
+            return MoveGenerator.generateMovesAbstract(tiles, row, col, isWhiteTurn, false, gameResult);
         }
 
         public bool move(int rowPiece, int colPiece, int rowDest, int colDest) {
@@ -118,9 +120,13 @@ namespace Assets.src {
                     break;
             }
 
+            movesInARowNoCapture = ChessTools.getPieceType(tiles, rowDest, colDest) == null ?
+               movesInARowNoCapture + 1 : 0; // Increment for 50 move rule
+
             tiles[rowDest, colDest] = tiles[rowPiece, colPiece];
             tiles[rowPiece, colPiece] = null;
-            gameResult = AfterMoveStateManager.updateBoardGeneral(tiles, isWhiteTurn, GetHashCode(), hashPosWhiteTurn, hashPosBlackTurn);
+            gameResult = AfterMoveStateManager.updateBoardGeneral(tiles, isWhiteTurn, 
+                GetHashCode(), hashPosWhiteTurn, hashPosBlackTurn, movesInARowNoCapture);
             isWhiteTurn = !isWhiteTurn;
 
         }

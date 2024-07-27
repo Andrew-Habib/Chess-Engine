@@ -11,7 +11,7 @@ namespace Assets.src {
     static class AfterMoveStateManager {
 
         public static bool[] updateBoardGeneral(ChessPiece[,] tiles, bool isWhiteTurn, int hashCode,
-            Dictionary<int, int> hashPosWhiteTurn, Dictionary<int, int> hashPosBlackTurn) {
+            Dictionary<int, int> hashPosWhiteTurn, Dictionary<int, int> hashPosBlackTurn, int movesInARowNoCapture) {
 
             List<int[]> currPlayerMoves = MoveGenerator.allPlayerMoves(tiles, isWhiteTurn, false);
             List<int[]> opposingMoves = MoveGenerator.allPlayerMoves(tiles, !isWhiteTurn, false);
@@ -60,11 +60,15 @@ namespace Assets.src {
                 } 
             }
 
-            bool threefold;
+            bool threefold; // 3 fold repetition rule handle
             if (isWhiteTurn)
                 threefold = checkThreeFoldRepetition(hashCode, hashPosWhiteTurn);
             else
                 threefold = checkThreeFoldRepetition(hashCode, hashPosBlackTurn);
+
+            if (!threefold && movesInARowNoCapture >= 50) { // 50 move rule handle
+                return new bool[] { true, true };
+            }
 
             return new bool[] { threefold, threefold };
             

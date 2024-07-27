@@ -14,7 +14,7 @@
         }
 
         public static PieceType? getPieceType(ChessPiece[,] board, int r, int c) {
-            if (board[r, c] == null) {
+            if (!inbounds(r, c) || board[r, c] == null) {
                 return null;
             } else {
                 return board[r, c].getType();

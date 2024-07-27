@@ -5,9 +5,11 @@ namespace Assets.src {
 
     static class MoveGenerator {
 
-        public static List<int[]> generateMovesAbstract(ChessPiece[,] board, int row, int col, bool whiteTurn, bool genDangerMode) {
+        public static List<int[]> generateMovesAbstract(ChessPiece[,] board, int row, int col, bool whiteTurn, bool genDangerMode, bool[] gameResult) {
 
-            if (!ChessTools.inbounds(row, col)) return new List<int[]>();
+            if (!ChessTools.inbounds(row, col) || (gameResult.Length == 2 && 
+                (gameResult[0] == true || gameResult[1] == true)))
+                return new List<int[]>();
 
             ChessPiece piece = board[row, col];
             List<int[]> moves = new();
@@ -38,7 +40,7 @@ namespace Assets.src {
             for (int r = 0; r < board.GetLength(0); r++) {
                 for (int c = 0; c < board.GetLength(1); c++) {
                     if (ChessTools.isCurrentPlayerPiece(board, r, c, whiteTurn)) {
-                        possibleMoves.AddRange(generateMovesAbstract(board, r, c, whiteTurn, nonAdjusted));
+                        possibleMoves.AddRange(generateMovesAbstract(board, r, c, whiteTurn, nonAdjusted, new bool[] { false, false }));
                     }
                 }
             }
