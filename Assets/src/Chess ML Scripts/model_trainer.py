@@ -1,5 +1,5 @@
 ﻿import pymongo
-import numpy as np
+import numpy
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense
 from tensorflow.keras.preprocessing.sequence import pad_sequences

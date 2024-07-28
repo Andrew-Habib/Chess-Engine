@@ -22,7 +22,7 @@
         }
 
         public static bool isCurrentPlayerPiece(ChessPiece[,] board, int r, int c, bool isWhiteTurn) {
-            if (board[r, c] == null) {
+            if (!inbounds(r, c) || board[r, c] == null) {
                 return false;
             } else {
                 return (isWhiteTurn && board[r, c].getColour() == Colour.LIGHT) ||

@@ -25,94 +25,95 @@ namespace Assets.src {
         }
 
         void Update() {
-
-            if (Input.GetMouseButtonDown(0)) {
-
-                List<RaycastHit2D> hitList = (Physics2D.RaycastAll(Camera.main.ScreenToWorldPoint(Input.mousePosition), 
-                                                    Vector2.zero)).ToList();
+            
+            List<RaycastHit2D> hitList = (Physics2D.RaycastAll(Camera.main.ScreenToWorldPoint(Input.mousePosition), 
+                                                Vector2.zero)).ToList();
                 
-                int dest_col = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).x);
-                int dest_row = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
+            int dest_col = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).x);
+            int dest_row = Mathf.RoundToInt(Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
 
-                if (hitList.Any(hit => hit.collider.CompareTag("MoveCollider"))) {
+            if (hitList.Any(hit => hit.collider.CompareTag("MoveCollider")) &&
+                (Input.GetMouseButtonDown(0) || Input.GetMouseButtonUp(0))) {
 
-                    Collider2D[] colliders = new Collider2D[0];
-                    Collider2D targetCollider = new();
-                    SpriteRenderer spriteRenderer = pieceSelected.GetComponent<SpriteRenderer>();
+                Collider2D[] colliders = new Collider2D[0];
+                Collider2D targetCollider = new();
+                SpriteRenderer spriteRenderer = pieceSelected.GetComponent<SpriteRenderer>();
+                
+                switch(ChessTools.getPieceType(board.getChessPieces(), piece_row, piece_col)) {
 
-                    switch(ChessTools.getPieceType(board.getChessPieces(), piece_row, piece_col)) {
+                    case PieceType.PAWN:
 
-                        case PieceType.PAWN:
+                        if (dest_row == 0) { // Black Pawn Promotes to Queen
 
-                            if (dest_row == 0) { // Black Pawn Promotes to Queen
+                            spriteRenderer.sprite = blackQueen;
 
-                                spriteRenderer.sprite = blackQueen;
+                        } else if (dest_row == 7) { // White Pawn Promotes to Queen
 
-                            } else if (dest_row == 7) { // White Pawn Promotes to Queen
+                            spriteRenderer.sprite = whiteQueen;
 
-                                spriteRenderer.sprite = whiteQueen;
+                        } else if (Math.Abs(piece_col - dest_col) == 1) { // Enpassent
 
-                            } else if (Math.Abs(piece_col - dest_col) == 1) { // Enpassent
-
-                                if (board.whiteTurn() && !hitList.Any(hit => hit.collider.CompareTag("BlackPiece"))) {
-                                    colliders = Physics2D.OverlapBoxAll(new Vector2(dest_col, dest_row - 1), new Vector2(1, 1), 0);
-                                    targetCollider = colliders.FirstOrDefault(c => c.CompareTag("BlackPiece"));
-                                    if (targetCollider != null) Destroy(targetCollider.gameObject);
-                                } else if (!board.whiteTurn() && !hitList.Any(hit => hit.collider.CompareTag("WhitePiece"))) {
-                                    colliders = Physics2D.OverlapBoxAll(new Vector2(dest_col, dest_row + 1), new Vector2(1, 1), 0);
-                                    targetCollider = colliders.FirstOrDefault(c => c.CompareTag("WhitePiece"));
-                                    if (targetCollider != null) Destroy(targetCollider.gameObject);
-                                }
-
+                            if (board.whiteTurn() && !hitList.Any(hit => hit.collider.CompareTag("BlackPiece"))) {
+                                colliders = Physics2D.OverlapBoxAll(new Vector2(dest_col, dest_row - 1), new Vector2(1, 1), 0);
+                                targetCollider = colliders.FirstOrDefault(c => c.CompareTag("BlackPiece"));
+                                if (targetCollider != null) Destroy(targetCollider.gameObject);
+                            } else if (!board.whiteTurn() && !hitList.Any(hit => hit.collider.CompareTag("WhitePiece"))) {
+                                colliders = Physics2D.OverlapBoxAll(new Vector2(dest_col, dest_row + 1), new Vector2(1, 1), 0);
+                                targetCollider = colliders.FirstOrDefault(c => c.CompareTag("WhitePiece"));
+                                if (targetCollider != null) Destroy(targetCollider.gameObject);
                             }
-                            break;
 
-                        case PieceType.KING:
+                        }
+                        break;
 
-                            if (piece_col - dest_col == 2 && 
-                                ChessTools.getPieceType(board.getChessPieces(), dest_row, 0) == PieceType.ROOK) { // Queen-side castle
+                    case PieceType.KING:
 
-                                colliders = Physics2D.OverlapBoxAll(new Vector2(0, dest_row), new Vector2(1, 1), 0);
-                                targetCollider = colliders.FirstOrDefault(c => c.CompareTag("WhitePiece") || c.CompareTag("BlackPiece"));
-                                if (targetCollider != null) targetCollider.transform.position = new Vector2(3, piece_row); // Rook to Queen square
+                        if (piece_col - dest_col == 2 && 
+                            ChessTools.getPieceType(board.getChessPieces(), dest_row, 0) == PieceType.ROOK) { // Queen-side castle
 
-                            } else if (piece_col - dest_col == -2 && 
-                                ChessTools.getPieceType(board.getChessPieces(), dest_row, 7) == PieceType.ROOK) { // King-side castle
+                            colliders = Physics2D.OverlapBoxAll(new Vector2(0, dest_row), new Vector2(1, 1), 0);
+                            targetCollider = colliders.FirstOrDefault(c => c.CompareTag("WhitePiece") || c.CompareTag("BlackPiece"));
+                            if (targetCollider != null) targetCollider.transform.position = new Vector2(3, piece_row); // Rook to Queen square
 
-                                colliders = Physics2D.OverlapBoxAll(new Vector2(7, dest_row), new Vector2(1, 1), 0);
-                                targetCollider = colliders.FirstOrDefault(c => c.CompareTag("WhitePiece") || c.CompareTag("BlackPiece"));
-                                if (targetCollider != null) targetCollider.transform.position = new Vector2(5, piece_row); // Rook to King's bishop square
+                        } else if (piece_col - dest_col == -2 && 
+                            ChessTools.getPieceType(board.getChessPieces(), dest_row, 7) == PieceType.ROOK) { // King-side castle
 
-                            }
-                            break;
+                            colliders = Physics2D.OverlapBoxAll(new Vector2(7, dest_row), new Vector2(1, 1), 0);
+                            targetCollider = colliders.FirstOrDefault(c => c.CompareTag("WhitePiece") || c.CompareTag("BlackPiece"));
+                            if (targetCollider != null) targetCollider.transform.position = new Vector2(5, piece_row); // Rook to King's bishop square
 
-                    }
-
-                     
-
-                    Destroy(hitList.First().collider.gameObject);
-                    board.move(piece_row, piece_col, dest_row, dest_col);
-                    pieceSelected.transform.position = new Vector3(dest_col, dest_row, -1f);
-                    removeAllMoveSprites();
-                    resetPieceSelection();
-                    Debug.Log(board.getResult());
-
-                } else if (hitList.Any(hit => hit.collider.CompareTag("WhitePiece")) ||
-                    hitList.Any(hit => hit.collider.CompareTag("BlackPiece"))) {
-
-                    removeAllMoveSprites();
-                    resetPieceSelection();
-                    pieceSelected = hitList.First().collider.gameObject;
-                    piece_col = dest_col;
-                    piece_row = dest_row;
-                    generateMoveSprites();
-
-                } else {
-
-                    removeAllMoveSprites();
-                    resetPieceSelection();
+                        }
+                        break;
 
                 }
+
+                String pieceToCapture = board.whiteTurn() ? "BlackPiece" : "WhitePiece";
+                
+                if (ChessTools.getPieceType(board.getChessPieces(), dest_row, dest_col) != null)
+                    Destroy(hitList.FirstOrDefault(hit => hit.collider.CompareTag(pieceToCapture)).collider.gameObject);
+
+                board.move(piece_row, piece_col, dest_row, dest_col);
+                pieceSelected.transform.position = new Vector3(dest_col, dest_row, -1f);
+                removeAllMoveSprites();
+                resetPieceSelection();
+                Debug.Log(board.getResult());
+
+            } else if ((hitList.Any(hit => hit.collider.CompareTag("WhitePiece")) ||
+                hitList.Any(hit => hit.collider.CompareTag("BlackPiece"))) && 
+                Input.GetMouseButtonDown(0)) {
+
+                removeAllMoveSprites();
+                resetPieceSelection();
+                pieceSelected = hitList.First().collider.gameObject;
+                piece_col = dest_col;
+                piece_row = dest_row;
+                generateMoveSprites();
+
+            } else if (Input.GetMouseButtonDown(0)) {
+
+                removeAllMoveSprites();
+                resetPieceSelection();
+
             }
 
         }
