@@ -1,8 +1,17 @@
-﻿namespace Assets.src {
+﻿using System;
+
+namespace Assets.src {
     static class ChessTools {
 
         public static string gridToChessCoord(int row, int column) {
             return ((char)('a' + column)).ToString() + (row + 1).ToString();
+        }
+
+        public static (int, int) chessCoordToGrid(string coord) {
+            if (coord == null || coord.Length != 2) {
+                throw new ArgumentException("Invalid chess coordinate");
+            }
+            return (coord[0] - 'a', int.Parse(coord[1].ToString()) - 1);
         }
 
         public static bool inbounds(int r, int c) {
