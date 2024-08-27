@@ -8,6 +8,12 @@
             moved = false;
         }
 
+        public override object Clone() {
+            return new Rook(colour) {
+                moved = moved
+            };
+        }
+
         public override PieceType getType() => PieceType.ROOK;
 
         public override int getValue() => (int) PieceType.ROOK;

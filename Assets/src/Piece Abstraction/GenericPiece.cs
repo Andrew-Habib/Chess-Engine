@@ -24,6 +24,8 @@
             return colour == other.colour;
         }
 
+        public abstract object Clone();
+
         public override int GetHashCode() {
             return colour.GetHashCode();
         }

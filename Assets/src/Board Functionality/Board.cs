@@ -4,14 +4,14 @@ using System.Collections.Generic;
 namespace Assets.src {
     class Board {
 
-        private readonly ChessPiece[,] tiles;
+        private ChessPiece[,] tiles;
         private bool isWhiteTurn;
         private bool[] gameResult;
-        private readonly King whiteKing;
-        private readonly King blackKing;
+        private King whiteKing;
+        private King blackKing;
         private int movesInARowNoCapture;
-        private readonly Dictionary<int, int> hashPosWhiteTurn;
-        private readonly Dictionary<int, int> hashPosBlackTurn;
+        private Dictionary<int, int> hashPosWhiteTurn;
+        private Dictionary<int, int> hashPosBlackTurn;
 
         public Board() {
 
@@ -24,6 +24,30 @@ namespace Assets.src {
             hashPosWhiteTurn = new Dictionary<int, int>();
             hashPosBlackTurn = new Dictionary<int, int>();
 
+        }
+
+        public object Clone() {
+            Board clonedBoard = new Board {
+                isWhiteTurn = isWhiteTurn,
+                gameResult = (bool[])gameResult.Clone(), // Deep copy of array
+                whiteKing = (King)whiteKing.Clone(), // Assuming King implements ICloneable
+                blackKing = (King)blackKing.Clone(), // Assuming King implements ICloneable
+                movesInARowNoCapture = movesInARowNoCapture,
+                hashPosWhiteTurn = hashPosWhiteTurn,
+                hashPosBlackTurn = hashPosBlackTurn
+            };
+
+            clonedBoard.tiles = new ChessPiece[8, 8];
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    if (tiles[i, j] != null) {
+                        clonedBoard.tiles[i, j] = (ChessPiece)tiles[i, j].Clone();
+                    } else {
+                        clonedBoard.tiles[i, j] = null;
+                    }
+                }
+            }
+            return clonedBoard;
         }
 
         public void initChessBoard() {

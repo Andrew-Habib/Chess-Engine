@@ -1,17 +1,28 @@
-﻿namespace Assets.src {
+﻿using System;
 
-    public class King : GenericPiece {
+namespace Assets.src {
 
-        private bool castlePrivelege;
+    public class King : GenericPiece, ICloneable {
+
+        private bool castlePrivilege;
         private bool inCheck;
         private bool checkmated;
         private bool stalemated;
 
         public King(Colour colour) : base(colour) {
-            castlePrivelege = true;
+            castlePrivilege = true;
             inCheck = false;
             checkmated = false;
             stalemated = false;
+        }
+
+        public override object Clone() {
+            return new King(colour) {
+                castlePrivilege = castlePrivilege,
+                inCheck = inCheck,
+                checkmated = checkmated,
+                stalemated = stalemated
+            };
         }
 
         public override PieceType getType() => PieceType.KING;
@@ -19,15 +30,15 @@
         public override int getValue() => (int) PieceType.KING;
 
         public void resetKingStates() {
-            castlePrivelege = true;
+            castlePrivilege = true;
             inCheck = false;
             checkmated = false;
             stalemated = false;
         }
 
-        public void revokeCastling() => castlePrivelege = false;
+        public void revokeCastling() => castlePrivilege = false;
 
-        public bool canCastle() => castlePrivelege;
+        public bool canCastle() => castlePrivilege;
 
         public void unCheckKing() => inCheck = false;
 

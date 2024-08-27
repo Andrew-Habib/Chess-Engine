@@ -10,6 +10,13 @@
             capturableEnpassent = false;
         }
 
+        public override object Clone() {
+            return new Pawn(colour) {
+                moved = moved,
+                capturableEnpassent = capturableEnpassent
+            };
+        }
+
         public override PieceType getType() => PieceType.PAWN;
 
         public override int getValue() => (int) PieceType.PAWN;
