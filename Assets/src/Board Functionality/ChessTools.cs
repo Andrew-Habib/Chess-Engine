@@ -14,6 +14,25 @@ namespace Assets.src {
             return (coord[0] - 'a', int.Parse(coord[1].ToString()) - 1);
         }
 
+        public static int[,] ConvertTo2DNumericalBoard(Board board) {
+            int[,] boardNumArray = new int[8, 8];
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    ChessPiece piece = board.getPieceAt(i, j);
+                    boardNumArray[i, j] = piece == null ? 0 : piece switch {
+                        Pawn => piece.getColour() == Colour.LIGHT ? 1 : -1,
+                        Knight => piece.getColour() == Colour.LIGHT ? 3 : -3,
+                        Bishop => piece.getColour() == Colour.LIGHT ? 4 : -4,
+                        Rook => piece.getColour() == Colour.LIGHT ? 5 : -5,
+                        Queen => piece.getColour() == Colour.LIGHT ? 9 : -9,
+                        King => piece.getColour() == Colour.LIGHT ? 1000 : -1000,
+                        _ => 0
+                    };
+                }
+            }
+            return boardNumArray;
+        }
+
         public static bool inbounds(int r, int c) {
             return (r >= 0 && r <= 7 && c >= 0 && c <= 7);
         }

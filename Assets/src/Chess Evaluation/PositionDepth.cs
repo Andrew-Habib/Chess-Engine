@@ -3,13 +3,12 @@ using UnityEngine;
 
 namespace Assets.src {
     public class PositionDepth {
-        public static List<int> depth3Positions() {
+        public static List<int[,]> depth3Positions() {
 
             Board board_d0 = new(); // current position
             board_d0.initChessBoard();
-            Dictionary<int, int> hashListPos = new();
+            List<int[,]> depth3Positions = new();
             bool whiteTurn = true;
-            int total = 0;
 
             List<int[]> moves_d0 = MoveGenerator.allPlayerMoves(board_d0.getChessPieces(), whiteTurn, false);
 
@@ -28,15 +27,12 @@ namespace Assets.src {
                     foreach (int[] move2 in moves_d2) {
                         Board board_d3 = (Board)board_d2.Clone();
                         board_d3.move(move2[0], move2[1], move2[2], move2[3]);
-                        List<int[]> moves_d3 = MoveGenerator.allPlayerMoves(board_d3.getChessPieces(), whiteTurn, false);
-                        total++;
-                        
+                        depth3Positions.Add(ChessTools.ConvertTo2DNumericalBoard(board_d3));                      
                     }
                 }
-                Debug.Log(total);
             }
 
-            return new List<int>();
+            return depth3Positions;
 
         }
     }
