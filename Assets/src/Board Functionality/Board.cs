@@ -29,12 +29,12 @@ namespace Assets.src {
         public object Clone() {
             Board clonedBoard = new Board {
                 isWhiteTurn = isWhiteTurn,
-                gameResult = (bool[])gameResult.Clone(), // Deep copy of array
+                gameResult = gameResult, // Deep copy of array
                 whiteKing = (King)whiteKing.Clone(), // Assuming King implements ICloneable
                 blackKing = (King)blackKing.Clone(), // Assuming King implements ICloneable
                 movesInARowNoCapture = movesInARowNoCapture,
-                hashPosWhiteTurn = hashPosWhiteTurn,
-                hashPosBlackTurn = hashPosBlackTurn
+                hashPosWhiteTurn = new Dictionary<int, int>(hashPosWhiteTurn),
+                hashPosBlackTurn = new Dictionary<int, int>(hashPosBlackTurn)
             };
 
             clonedBoard.tiles = new ChessPiece[8, 8];

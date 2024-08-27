@@ -29,11 +29,28 @@ namespace Assets.src {
                 }
             }
 
-            return moves;
+            return moves; // Returns destinations { [x1, y1], [x2, y2] }
 
         }
 
         public static List<int[]> allPlayerMoves(ChessPiece[,] board, bool whiteTurn, bool nonAdjusted) {
+            List<int[]> possibleMoves = new();
+
+            for (int r = 0; r < board.GetLength(0); r++) {
+                for (int c = 0; c < board.GetLength(1); c++) {
+                    if (ChessTools.isCurrentPlayerPiece(board, r, c, whiteTurn)) {
+                        var moves = generateMovesAbstract(board, r, c, whiteTurn, nonAdjusted, new bool[] { false, false });
+                        foreach (var move in moves) {
+                            possibleMoves.Add(new int[] { r, c, move[0], move[1] });
+                        }
+                    }
+                }
+            }
+
+            return possibleMoves; // { [row, col, destrow, destcol] }
+        }
+
+        public static List<int[]> allPlayerSquaresOccupied(ChessPiece[,] board, bool whiteTurn, bool nonAdjusted) {
 
             List<int[]> possibleMoves = new();
 
@@ -45,7 +62,7 @@ namespace Assets.src {
                 }
             }
 
-            return possibleMoves;
+            return possibleMoves; // { [destrow, destcol] }
 
         }
 
@@ -62,7 +79,7 @@ namespace Assets.src {
                 board[possible_row, possible_col] = board[row, col];
                 board[row, col] = null;
 
-                dangerZones = allPlayerMoves(board, !whiteTurn, true);
+                dangerZones = allPlayerSquaresOccupied(board, !whiteTurn, true);
 
                 foreach (int[] zone in dangerZones) {
                     if (ChessTools.getPieceType(board, zone[0], zone[1]) == PieceType.KING) {

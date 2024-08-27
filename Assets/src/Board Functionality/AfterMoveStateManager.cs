@@ -13,8 +13,8 @@ namespace Assets.src {
         public static bool[] updateBoardGeneral(ChessPiece[,] tiles, bool isWhiteTurn, int hashCode,
             Dictionary<int, int> hashPosWhiteTurn, Dictionary<int, int> hashPosBlackTurn, int movesInARowNoCapture) {
 
-            List<int[]> currPlayerMoves = MoveGenerator.allPlayerMoves(tiles, isWhiteTurn, false);
-            List<int[]> opposingMoves = MoveGenerator.allPlayerMoves(tiles, !isWhiteTurn, false);
+            List<int[]> currPlayerMoves = MoveGenerator.allPlayerSquaresOccupied(tiles, isWhiteTurn, false);
+            List<int[]> opposingMoves = MoveGenerator.allPlayerSquaresOccupied(tiles, !isWhiteTurn, false);
 
             foreach (int[] zone in currPlayerMoves) { // Check for checks and checkmates
                 if (ChessTools.getPieceType(tiles, zone[0], zone[1]) == PieceType.KING) {
