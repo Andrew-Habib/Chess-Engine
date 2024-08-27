@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace Assets.src {
-    class Board {
+    public class Board {
 
         private ChessPiece[,] tiles;
         private bool isWhiteTurn;
@@ -27,7 +27,7 @@ namespace Assets.src {
         }
 
         public object Clone() {
-            Board clonedBoard = new Board {
+            Board clonedBoard = new() {
                 isWhiteTurn = isWhiteTurn,
                 gameResult = gameResult, // Deep copy of array
                 whiteKing = (King)whiteKing.Clone(), // Assuming King implements ICloneable

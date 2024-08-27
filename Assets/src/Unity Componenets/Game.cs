@@ -21,7 +21,7 @@ namespace Assets.src {
 
             board = new Board();
             board.initChessBoard();
-            PositionDepth.depth3Positions();
+            PositionDepth.depth3Positions(board);
 
         }
 

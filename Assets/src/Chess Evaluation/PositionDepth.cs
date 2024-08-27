@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
+using System.IO;
 
 namespace Assets.src {
     public class PositionDepth {
-        public static List<int[,]> depth3Positions() {
 
-            Board board_d0 = new(); // current position
+        public static List<int[,]> depth3Positions(Board board) {
+
+            Board board_d0 = board; // current position
             board_d0.initChessBoard();
             List<int[,]> depth3Positions = new();
             bool whiteTurn = true;
@@ -32,8 +33,31 @@ namespace Assets.src {
                 }
             }
 
+            sendToTxt(depth3Positions);
+
             return depth3Positions;
 
         }
+
+        private static void sendToTxt(List<int[,]> depth3Positions) {
+            using (StreamWriter writer = new StreamWriter("data.txt")) {
+                foreach (var array in depth3Positions) {
+                    int rows = array.GetLength(0);
+                    int cols = array.GetLength(1);
+
+                    for (int i = 0; i < rows; i++) {
+                        for (int j = 0; j < cols; j++) {
+                            writer.Write(array[i, j]);
+                            if (j < cols - 1) {
+                                writer.Write(",");
+                            }
+                        }
+                        writer.WriteLine();
+                    }
+                    writer.Write("|\n");
+                }
+            }
+        }
+
     }
 }

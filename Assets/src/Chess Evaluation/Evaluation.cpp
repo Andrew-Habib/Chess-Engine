@@ -6,8 +6,75 @@ using namespace std;
 // Will use principle evaluation ideas + extensions/customizations but with unique methods and weights
 // Source: https://chessify.me/blog/chess-engine-evaluation
 
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <sstream>
+using namespace std;
+
 int main() {
-    cout << "Evaluation";
+    ifstream file("../../../data.txt");
+    string line;
+    vector<vector<vector<int>>> data; // 3D vector to store arrays
+    vector<vector<int>> currentArray;
+    vector<int> currentRow;
+
+    if (!file) {
+        cerr << "Unable to open file";
+        return 1;
+    }
+
+    while (getline(file, line)) {
+        if (line.empty()) {
+            continue; // Skip empty lines
+        }
+
+        if (line == "|") {
+            // End of a 2D array
+            if (!currentArray.empty()) {
+                data.push_back(currentArray);
+                currentArray.clear();
+            }
+            continue;
+        }
+
+        istringstream iss(line);
+        string value;
+        currentRow.clear();
+        while (getline(iss, value, ',')) {
+            currentRow.push_back(stoi(value));
+        }
+
+        if (!currentArray.empty() && currentRow.size() == currentArray[0].size()) {
+            currentArray.push_back(currentRow);
+        }
+        else {
+            if (!currentArray.empty()) {
+                data.push_back(currentArray);
+            }
+            currentArray.clear();
+            currentArray.push_back(currentRow);
+        }
+    }
+
+    // Add the last array if needed
+    if (!currentArray.empty()) {
+        data.push_back(currentArray);
+    }
+
+    file.close();
+
+    // Print the data
+    for (const auto& matrix : data) {
+        for (const auto& row : matrix) {
+            for (int value : row) {
+                cout << value << " ";
+            }
+            cout << endl;
+        }
+        cout << endl;
+    }
+
     return 0;
 }
 
