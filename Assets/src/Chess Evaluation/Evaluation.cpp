@@ -12,16 +12,22 @@ using namespace std;
 #include <sstream>
 using namespace std;
 
+void getDepth3Positions();
+
 int main() {
+    getDepth3Positions();
+    return 0;
+}
+
+void getDepth3Positions() { 
     ifstream file("../../../data.txt");
     string line;
-    vector<vector<vector<int>>> data; // 3D vector to store arrays
+    vector<vector<vector<int>>> d3Positions; // 3D vector to store arrays
     vector<vector<int>> currentArray;
     vector<int> currentRow;
 
     if (!file) {
         cerr << "Unable to open file";
-        return 1;
     }
 
     while (getline(file, line)) {
@@ -32,7 +38,7 @@ int main() {
         if (line == "|") {
             // End of a 2D array
             if (!currentArray.empty()) {
-                data.push_back(currentArray);
+                d3Positions.push_back(currentArray);
                 currentArray.clear();
             }
             continue;
@@ -50,7 +56,7 @@ int main() {
         }
         else {
             if (!currentArray.empty()) {
-                data.push_back(currentArray);
+                d3Positions.push_back(currentArray);
             }
             currentArray.clear();
             currentArray.push_back(currentRow);
@@ -59,13 +65,13 @@ int main() {
 
     // Add the last array if needed
     if (!currentArray.empty()) {
-        data.push_back(currentArray);
+        d3Positions.push_back(currentArray);
     }
 
     file.close();
 
-    // Print the data
-    for (const auto& matrix : data) {
+    // Print the d3Positions
+    for (const auto& matrix : d3Positions) {
         for (const auto& row : matrix) {
             for (int value : row) {
                 cout << value << " ";
@@ -75,10 +81,9 @@ int main() {
         cout << endl;
     }
 
-    return 0;
 }
 
-int evaluateMove() {
+int evaluate_pos() {
     int move_score = 0;
     return 0;
 }

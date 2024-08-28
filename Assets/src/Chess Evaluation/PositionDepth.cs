@@ -28,9 +28,11 @@ namespace Assets.src {
                     foreach (int[] move2 in moves_d2) {
                         Board board_d3 = (Board)board_d2.Clone();
                         board_d3.move(move2[0], move2[1], move2[2], move2[3]);
-                        depth3Positions.Add(ChessTools.ConvertTo2DNumericalBoard(board_d3));                      
+                        depth3Positions.Add(ChessTools.ConvertTo2DNumericalBoard(board_d3));  
                     }
+                    depth3Positions.Add(new int[,] { { 2 } } ); // Dividers where all pos in the same division have the same parent depth 2
                 }
+                depth3Positions.Add(new int[,] { { 1 } }); // Dividers where all pos in the same division have the same parent depth 1
             }
 
             sendToTxt(depth3Positions);
