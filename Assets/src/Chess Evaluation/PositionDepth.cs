@@ -7,9 +7,8 @@ namespace Assets.src {
         public static List<int[,]> depth3Positions(Board board) {
 
             Board board_d0 = board; // current position
-            board_d0.initChessBoard();
             List<int[,]> depth3Positions = new();
-            bool whiteTurn = true;
+            bool whiteTurn = board.whiteTurn();
 
             List<int[]> moves_d0 = MoveGenerator.allPlayerMoves(board_d0.getChessPieces(), whiteTurn, false);
 
@@ -35,14 +34,21 @@ namespace Assets.src {
                 depth3Positions.Add(new int[,] { { 1 } }); // Dividers where all pos in the same division have the same parent depth 1
             }
 
-            sendToTxt(depth3Positions);
+            sendToTxt(depth3Positions, whiteTurn);
 
             return depth3Positions;
 
         }
 
-        private static void sendToTxt(List<int[,]> depth3Positions) {
+        private static void sendToTxt(List<int[,]> depth3Positions, bool whiteTurn) {
             using (StreamWriter writer = new StreamWriter("data.txt")) {
+                if (whiteTurn) {
+                    writer.Write(10);
+                } else {
+                    writer.Write(-10);
+                }
+                writer.WriteLine();
+
                 foreach (var array in depth3Positions) {
                     int rows = array.GetLength(0);
                     int cols = array.GetLength(1);
