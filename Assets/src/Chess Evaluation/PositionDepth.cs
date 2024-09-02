@@ -29,9 +29,9 @@ namespace Assets.src {
                         board_d3.move(move2[0], move2[1], move2[2], move2[3]);
                         depth3Positions.Add(ChessTools.ConvertTo2DNumericalBoard(board_d3));  
                     }
-                    depth3Positions.Add(new int[,] { { 2 } } ); // Dividers where all pos in the same division have the same parent depth 2
+                    depth3Positions.Add(new int[,] { { 222 } } ); // Dividers where all pos in the same division have the same parent depth 2
                 }
-                depth3Positions.Add(new int[,] { { 1 } }); // Dividers where all pos in the same division have the same parent depth 1
+                depth3Positions.Add(new int[,] { { 111 } }); // Dividers where all pos in the same division have the same parent depth 1
             }
 
             sendToTxt(depth3Positions, whiteTurn);
