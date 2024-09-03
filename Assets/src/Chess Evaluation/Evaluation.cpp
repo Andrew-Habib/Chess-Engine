@@ -4,7 +4,13 @@
 // Source: https://chessify.me/blog/chess-engine-evaluation
 // Check pieces around the king
 // https://www.netlib.org/utk/lsi/pcwLSI/text/node343.html#:~:text=King%20safety%20is%20evaluated%20by,in%20front%20of%20the%20king.
-
+// Alpha beta pruning + minimax aglorithm https://www.youtube.com/watch?v=l-hh51ncgDI
+/*for (const auto& row : pos[ind_d1pos][ind_d2pos][ind_d3pos]) {
+    for (int value : row) {
+        cout << value << " ";
+    }
+    cout << endl;
+}*/
 
 #include <iostream>
 #include <fstream>
@@ -21,6 +27,7 @@ vector<vector<int>> numd3pos; // Number of moves possible at Depth 2. .size for 
 
 vector<vector<vector<vector<vector<int>>>>> interpretD3PosTxt(); // Outer d1, 2nd d2 pos, 3rd d3 pos
 float evaluatePos(vector<vector<int>> position, int ind_d2pos, int ind_d3pos);
+float alphaBetaPruneD3Positions(vector<vector<vector<vector<vector<int>>>>> pos);
 float materialScore(vector<vector<int>> position);
 float kingScore(vector<vector<int>> position);
 float mobilityScore(vector<vector<int>> position, int ind_d2pos, int ind_d3pos);
@@ -30,22 +37,8 @@ float pawnStructureScore(vector<vector<int>> position);
 
 int main() {
     vector<vector<vector<vector<vector<int>>>>> pos = interpretD3PosTxt();
-    for (int ind_d1pos = 0; ind_d1pos < pos.size(); ind_d1pos++) { // All positions in depth 0 (Moves for depth 1)
-        for (int ind_d2pos = 0; ind_d2pos < pos[ind_d1pos].size(); ind_d2pos++) { // All positions in depth 1 (Moves for depth 2)
-            for (int ind_d3pos = 0; ind_d3pos < pos[ind_d1pos][ind_d2pos].size(); ind_d3pos++) { // All positions in depth 2 (Moves for depth 3)
-                for (const auto& row : pos[ind_d1pos][ind_d2pos][ind_d3pos]) {
-                    for (int value : row) {
-                        cout << value << " ";
-                    }
-                    cout << endl;
-                }
-                float evaluation = evaluatePos(pos[ind_d1pos][ind_d2pos][ind_d3pos], ind_d1pos, ind_d2pos);
-                cout << "Eval: " << evaluation << " \n";
-            }
-        }
-    }
-    cout << pos.size();
-    cout << pos[2].size();
+    float evalBest = alphaBetaPruneD3Positions(pos);
+    cout << evalBest;
     for (int i = 0; i < numd3pos.size(); i++) {
         cout << "Depth 2 Moves for Position " << i + 1 << ": ";
         for (int j = 0; j < numd3pos[i].size(); j++) {
@@ -162,12 +155,99 @@ float evaluatePos(vector<vector<int>> position, int ind_d2pos, int ind_d3pos) {
 
 }
 
+float alphaBetaPruneD3Positions(vector<vector<vector<vector<vector<int>>>>> pos) {
+    
+    float alpha1 = -100000;
+    float beta1 = 100000;
+    float extEval1 = whiteTurn ? -100000 : 100000;
+
+    for (int ind_d1pos = 0; ind_d1pos < pos.size(); ind_d1pos++) {
+
+        float alpha2 = -100000;
+        float beta2 = 100000;
+        float extEval2 = !whiteTurn ? -100000 : 100000;
+
+        for (int ind_d2pos = 0; ind_d2pos < pos[ind_d1pos].size(); ind_d2pos++) {
+
+            float alpha3 = -100000;
+            float beta3 = 100000;
+            float extEval3 = whiteTurn ? -100000 : 100000;
+
+            for (int ind_d3pos = 0; ind_d3pos < pos[ind_d1pos][ind_d2pos].size(); ind_d3pos++) {
+                float eval3 = evaluatePos(pos[ind_d1pos][ind_d2pos][ind_d3pos], ind_d1pos, ind_d2pos);
+                extEval3 = whiteTurn ? max(alpha3, eval3) : min(beta3, eval3);
+
+                if (whiteTurn) {
+                    alpha3 = max(alpha3, eval3);
+                } else {
+                    beta3 = min(beta3, eval3);
+                }
+
+                if (beta3 <= alpha3) {
+                    break;
+                } else if (whiteTurn) {
+                    beta2 = alpha3;
+                } else {
+                    alpha2 = beta3;
+                }
+            }
+
+            float eval2 = extEval3;
+            extEval2 = !whiteTurn ? max(alpha2, eval2) : min(beta2, eval2);
+
+            if (!whiteTurn) {
+                alpha2 = max(alpha2, eval2);
+            } else {
+                beta2 = min(beta2, eval2);
+            }
+
+            if (beta2 <= alpha2) {
+                break;
+            }
+            else if (!whiteTurn) {
+                beta1 = alpha2;
+            }
+            else {
+                alpha1 = beta2;
+            }
+
+        }
+
+        float eval1 = extEval2;
+        extEval1 = whiteTurn ? max(alpha1, eval1) : min(beta1, eval1);
+
+        if (whiteTurn) {
+            alpha1 = max(alpha1, eval1);
+        }
+        else {
+            beta1 = min(beta1, eval1);
+        }
+
+        if (beta1 <= alpha1) {
+            break;
+        }
+
+    }
+
+    if (whiteTurn) {
+        return alpha1;
+    }
+    return beta1;
+
+}
+
 float materialScore(vector<vector<int>> position) {
 
     float score = 0;
     for (const auto& row : position) {
         for (int piece : row) {
-            score = score + piece;
+            if (piece != 4 || piece != -4) {
+                score = score + piece;
+            } else if (piece == 4) {
+                score = score + 3.15;
+            } else if (piece == -4) {
+                score = score - 3.15;
+            }
         }
     }
     return score;
@@ -192,36 +272,90 @@ float coordScore(vector<vector<int>> position) {
 
 float piecePosScore(vector<vector<int>> position) {
     float score = 0;
-    vector<vector<float>> preferred_king_squares = {
-        {0.15, 0.15, 0.1, 0.05, 0.05, 0.1, 0.15, 0.15},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {-0.15, -0.15, -0.1, -0.05, -0.05, -0.1, -0.15, -0.15}
+    vector<vector<float>> preferred_white_king_squares = {
+        {0.2, 0.25, 0.1, 0, 0, 0.1, 0.25, 0.2},
+        {-0.2, -0.2, -0.2, -0.2, -0.2, -0.2, -0.2, -0.2},
+        {-0.5, -0.5, -0.5, -0.25, -0.25, -0.5, -0.5, -0.5},
+        {-1, -1, -1, -1, -1, -1, -1, -1},
+        {-2, -2, -2, -2, -2, -2, -2, -2},
+        {-3, -3, -3, -3, -3, -3, -3, -3},
+        {-4, -4, -4, -4, -4, -4, -4, -4},
+        {-5, -5, -5, -5, -5, -5, -5, -5}
     };
 
-    vector<vector<float>> preferred_bishop_squares = {
-        {0.15, 0.15, 0.1, 0.05, 0.05, 0.1, 0.15, 0.15},
+    vector<vector<float>> preferred_black_king_squares = {
+        {5, 5, 5, 5, 5, 5, 5, 5},
+        {4, 4, 4, 4, 4, 4, 4, 4},
+        {3, 3, 3, 3, 3, 3, 3, 3},
+        {2, 2, 2, 2, 2, 2, 2, 2},
+        {1, 1, 1, 1, 1, 1, 1, 1},
+        {0.5, 0.5, 0.5, 0.25, 0.25, 0.5, 0.5, 0.5},
+        {0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2},
+        {-0.2, -0.25, -0.1, 0, 0, -0.1, -0.25, -0.2}
+    };
+
+    vector<vector<float>> preferred_white_bishop_squares = {
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0},
-        {-0.15, -0.15, -0.1, -0.05, -0.05, -0.1, -0.15, -0.15}
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0}
+    };
+
+    vector<vector<float>> preferred_black_bishop_squares = {
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0}
+    };
+
+    vector<vector<float>> preferred_white_knight_squares = {
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0.05, 0.05, 0.1, 0.1, 0.05, 0.05, 0},
+        {0.1, 0.15, 0.25, 0.15, 0.15, 0.25, 0.15, 0.1},
+        {0.1, 0.15, 0.15, 0.35, 0.35, 0.15, 0.15, 0.1},
+        {0.1, 0.25, 0.15, 0.35, 0.35, 0.15, 0.25, 0.1},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0}
+    };
+
+    vector<vector<float>> preferred_black_knight_squares = {
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {-0.1, -0.25, -0.15, -0.35, -0.35, -0.15, -0.25, -0.1},
+        {-0.1, -0.15, -0.15, -0.35, -0.35, -0.15, -0.15, -0.1},
+        {-0.1, -0.15, -0.25, -0.15, -0.15, -0.25, -0.15, -0.1},
+        {0, -0.05, -0.05, -0.1, -0.1, -0.05, -0.05, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0}
     };
 
     for (int i = 0; i < position.size(); i++) {
         for (int j = 0; j < position[i].size(); j++) {
-            if (position[i][j] == 1000 || position[i][j] == -1000) {
-                score = score + preferred_king_squares[i][j];
+            if (position[i][j] == 1000) {
+                score = score + preferred_white_king_squares[i][j];
+            } else if (position[i][j] == -1000) {
+                score = score - preferred_black_king_squares[i][j];
+            } else if (position[i][j] == 4) {
+                score = score + preferred_white_bishop_squares[i][j];
+            } else if (position[i][j] == -4) {
+                score = score + preferred_black_bishop_squares[i][j];
+            } else if (position[i][j] == 3) {
+                score = score + preferred_white_knight_squares[i][j];
+            } else if (position[i][j] == -3) {
+                score = score + preferred_black_knight_squares[i][j];
             }
         }
     }
-    return 0;
+    return score;
 }
 
 float pawnStructureScore(vector<vector<int>> position) {

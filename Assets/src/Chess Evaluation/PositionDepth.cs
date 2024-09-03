@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Assets.src {
     public class PositionDepth {
-
+        
         public static List<int[,]> depth3Positions(Board board) {
 
             Board board_d0 = board; // current position
