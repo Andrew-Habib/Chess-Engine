@@ -39,6 +39,7 @@ int main() {
     vector<vector<vector<vector<vector<int>>>>> pos = interpretD3PosTxt();
     float evalBest = alphaBetaPruneD3Positions(pos);
     cout << evalBest;
+
     for (int i = 0; i < numd3pos.size(); i++) {
         cout << "Depth 2 Moves for Position " << i + 1 << ": ";
         for (int j = 0; j < numd3pos[i].size(); j++) {
@@ -149,7 +150,7 @@ float evaluatePos(vector<vector<int>> position, int ind_d2pos, int ind_d3pos) {
     float piece_pos_score = piecePosScore(position);
     float pawn_structure_score = pawnStructureScore(position);
 
-    position_score = material_score + king_safety_score + mobility_score + coord_score + piece_pos_score;
+    position_score = material_score + king_safety_score + mobility_score + coord_score + piece_pos_score + pawn_structure_score;
 
     return position_score;
 
@@ -160,6 +161,9 @@ float alphaBetaPruneD3Positions(vector<vector<vector<vector<vector<int>>>>> pos)
     float alpha1 = -100000;
     float beta1 = 100000;
     float extEval1 = whiteTurn ? -100000 : 100000;
+    vector<vector<int>> bestPos1;
+    vector<vector<int>> bestPos2;
+    vector<vector<int>> bestPos3;
 
     for (int ind_d1pos = 0; ind_d1pos < pos.size(); ind_d1pos++) {
 
@@ -178,61 +182,69 @@ float alphaBetaPruneD3Positions(vector<vector<vector<vector<vector<int>>>>> pos)
                 extEval3 = whiteTurn ? max(alpha3, eval3) : min(beta3, eval3);
 
                 if (whiteTurn) {
-                    alpha3 = max(alpha3, eval3);
-                } else {
-                    beta3 = min(beta3, eval3);
+                    if (eval3 > alpha3) {
+                        bestPos3 = pos[ind_d1pos][ind_d2pos][ind_d3pos];
+                        alpha3 = eval3;
+                    }
+                }
+                else {
+                    if (eval3 < beta3) {
+                        bestPos3 = pos[ind_d1pos][ind_d2pos][ind_d3pos];
+                        beta3 = eval3;
+                    }
                 }
 
                 if (beta3 <= alpha3) {
                     break;
-                } else if (whiteTurn) {
-                    beta2 = alpha3;
-                } else {
-                    alpha2 = beta3;
                 }
             }
 
             float eval2 = extEval3;
-            extEval2 = !whiteTurn ? max(alpha2, eval2) : min(beta2, eval2);
+            if ((!whiteTurn && eval2 > alpha2) || (whiteTurn && eval2 < beta2)) {
+                bestPos2 = bestPos3;
+                extEval2 = eval2;
 
-            if (!whiteTurn) {
-                alpha2 = max(alpha2, eval2);
-            } else {
-                beta2 = min(beta2, eval2);
+                if (!whiteTurn) {
+                    alpha2 = eval2;
+                }
+                else {
+                    beta2 = eval2;
+                }
             }
 
             if (beta2 <= alpha2) {
                 break;
             }
-            else if (!whiteTurn) {
-                beta1 = alpha2;
-            }
-            else {
-                alpha1 = beta2;
-            }
-
         }
 
         float eval1 = extEval2;
-        extEval1 = whiteTurn ? max(alpha1, eval1) : min(beta1, eval1);
+        if ((whiteTurn && eval1 > alpha1) || (!whiteTurn && eval1 < beta1)) {
+            bestPos1 = bestPos2;
+            extEval1 = eval1;
 
-        if (whiteTurn) {
-            alpha1 = max(alpha1, eval1);
-        }
-        else {
-            beta1 = min(beta1, eval1);
+            if (whiteTurn) {
+                alpha1 = eval1;
+            }
+            else {
+                beta1 = eval1;
+            }
         }
 
         if (beta1 <= alpha1) {
             break;
         }
-
     }
 
-    if (whiteTurn) {
-        return alpha1;
+    // At the end of the loop, bestPos1 contains the best move
+
+    for (const auto& row : bestPos1) {
+        for (int value : row) {
+            cout << value << " ";
+        }
+        cout << endl;
     }
-    return beta1;
+
+    return extEval1;
 
 }
 
@@ -262,7 +274,7 @@ float kingScore(vector<vector<int>> position) {
 
 float mobilityScore(vector<vector<int>> position, int ind_d1pos, int ind_d2pos) {
     float adjustment_factor = whiteTurn ? 0.1 : -0.1;
-    float score = (numd3pos[ind_d1pos][ind_d2pos] - numd3pos[ind_d1pos].size()) * adjustment_factor;
+    float score = 0;
     return score;
 }
 
@@ -343,7 +355,7 @@ float piecePosScore(vector<vector<int>> position) {
             if (position[i][j] == 1000) {
                 score = score + preferred_white_king_squares[i][j];
             } else if (position[i][j] == -1000) {
-                score = score - preferred_black_king_squares[i][j];
+                score = score + preferred_black_king_squares[i][j];
             } else if (position[i][j] == 4) {
                 score = score + preferred_white_bishop_squares[i][j];
             } else if (position[i][j] == -4) {
