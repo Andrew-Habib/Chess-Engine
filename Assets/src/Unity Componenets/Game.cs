@@ -22,7 +22,14 @@ namespace Assets.src {
             board = new Board();
             board.initChessBoard();
             PositionDepth.depth3Positions(board);
-
+            //board.move(1, 0, 2, 0);
+            //board.move(6, 0, 4, 0);
+            //board.move(2, 0, 3, 0);
+            //board.PrintBoardState();
+            //board.unmove();
+            //board.PrintBoardState();
+            //board.move(2, 0, 3, 0);
+            //board.PrintBoardState();
         }
 
         void Update() {

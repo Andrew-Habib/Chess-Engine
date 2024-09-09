@@ -38,7 +38,7 @@ float pawnStructureScore(vector<vector<int>> position);
 int main() {
     vector<vector<vector<vector<vector<int>>>>> pos = interpretD3PosTxt();
     float evalBest = alphaBetaPruneD3Positions(pos);
-    cout << evalBest;
+    cout << evalBest << "\n";
 
     for (int i = 0; i < numd3pos.size(); i++) {
         cout << "Depth 2 Moves for Position " << i + 1 << ": ";
@@ -186,8 +186,7 @@ float alphaBetaPruneD3Positions(vector<vector<vector<vector<vector<int>>>>> pos)
                         bestPos3 = pos[ind_d1pos][ind_d2pos][ind_d3pos];
                         alpha3 = eval3;
                     }
-                }
-                else {
+                } else {
                     if (eval3 < beta3) {
                         bestPos3 = pos[ind_d1pos][ind_d2pos][ind_d3pos];
                         beta3 = eval3;
@@ -206,8 +205,7 @@ float alphaBetaPruneD3Positions(vector<vector<vector<vector<vector<int>>>>> pos)
 
                 if (!whiteTurn) {
                     alpha2 = eval2;
-                }
-                else {
+                } else {
                     beta2 = eval2;
                 }
             }
@@ -224,8 +222,7 @@ float alphaBetaPruneD3Positions(vector<vector<vector<vector<vector<int>>>>> pos)
 
             if (whiteTurn) {
                 alpha1 = eval1;
-            }
-            else {
+            } else {
                 beta1 = eval1;
             }
         }
@@ -234,8 +231,6 @@ float alphaBetaPruneD3Positions(vector<vector<vector<vector<vector<int>>>>> pos)
             break;
         }
     }
-
-    // At the end of the loop, bestPos1 contains the best move
 
     for (const auto& row : bestPos1) {
         for (int value : row) {
@@ -308,10 +303,10 @@ float piecePosScore(vector<vector<int>> position) {
 
     vector<vector<float>> preferred_white_bishop_squares = {
         {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0.1, 0.25, 0.1, 0.15, 0.15, 0.1, 0.25, 0.1},
+        {0.1, 0.1, 0.15, 0.2, 0.2, 0.15, 0.1, 0.1},
+        {0.15, 0.15, 0.25, 0.2, 0.2, 0.25, 0.15, 0.15},
+        {0.15, 0, 0, 0, 0, 0, 0, 0.15},
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0}
@@ -349,6 +344,8 @@ float piecePosScore(vector<vector<int>> position) {
         {0, -0.05, -0.05, -0.1, -0.1, -0.05, -0.05, 0},
         {0, 0, 0, 0, 0, 0, 0, 0}
     };
+
+
 
     for (int i = 0; i < position.size(); i++) {
         for (int j = 0; j < position[i].size(); j++) {

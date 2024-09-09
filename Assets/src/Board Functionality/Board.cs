@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 namespace Assets.src {
+
+    [Serializable]
     public class Board {
 
         private ChessPiece[,] tiles;
@@ -12,6 +15,7 @@ namespace Assets.src {
         private int movesInARowNoCapture;
         private Dictionary<int, int> hashPosWhiteTurn;
         private Dictionary<int, int> hashPosBlackTurn;
+        private Stack<Stack<Tuple<int, int, ChessPiece>>> oldPiecePositions;
 
         public Board() {
 
@@ -23,31 +27,8 @@ namespace Assets.src {
             movesInARowNoCapture = 0;
             hashPosWhiteTurn = new Dictionary<int, int>();
             hashPosBlackTurn = new Dictionary<int, int>();
+            oldPiecePositions = new();
 
-        }
-
-        public object Clone() {
-            Board clonedBoard = new() {
-                isWhiteTurn = isWhiteTurn,
-                gameResult = gameResult, // Deep copy of array
-                whiteKing = (King)whiteKing.Clone(), // Assuming King implements ICloneable
-                blackKing = (King)blackKing.Clone(), // Assuming King implements ICloneable
-                movesInARowNoCapture = movesInARowNoCapture,
-                hashPosWhiteTurn = new Dictionary<int, int>(hashPosWhiteTurn),
-                hashPosBlackTurn = new Dictionary<int, int>(hashPosBlackTurn)
-            };
-
-            clonedBoard.tiles = new ChessPiece[8, 8];
-            for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 8; j++) {
-                    if (tiles[i, j] != null) {
-                        clonedBoard.tiles[i, j] = (ChessPiece)tiles[i, j].Clone();
-                    } else {
-                        clonedBoard.tiles[i, j] = null;
-                    }
-                }
-            }
-            return clonedBoard;
         }
 
         public void initChessBoard() {
@@ -94,7 +75,29 @@ namespace Assets.src {
                 }
             }
 
+        }
 
+        public Board Clone() {
+
+            Board clonedBoard = new() {
+                isWhiteTurn = isWhiteTurn,
+                gameResult = gameResult, // Deep copy of array
+                whiteKing = (King)whiteKing.Clone(), // Assuming King implements ICloneable
+                blackKing = (King)blackKing.Clone(), // Assuming King implements ICloneable
+                movesInARowNoCapture = movesInARowNoCapture,
+                hashPosWhiteTurn = new Dictionary<int, int>(hashPosWhiteTurn),
+                hashPosBlackTurn = new Dictionary<int, int>(hashPosBlackTurn)
+            };
+
+            clonedBoard.tiles = new ChessPiece[8, 8];
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    if (tiles[i, j] != null) {
+                        clonedBoard.tiles[i, j] = (ChessPiece)tiles[i, j].Clone();
+                    }
+                }
+            }
+            return clonedBoard;
 
         }
 
@@ -132,27 +135,75 @@ namespace Assets.src {
 
         private void confirmMoveBoardStateManager(int rowPiece, int colPiece, int rowDest, int colDest) {
 
+
+            Stack<Tuple<int, int, ChessPiece>> currPiecePos = new();
+
             switch (ChessTools.getPieceType(tiles, rowPiece, colPiece)) {
                 case PieceType.PAWN:
-                    AfterMoveStateManager.updatePawnState(tiles, isWhiteTurn, rowPiece, colPiece, rowDest, colDest);
+                    AfterMoveStateManager.updatePawnState(tiles, isWhiteTurn, rowPiece, colPiece, rowDest, colDest, currPiecePos);
                     break;
                 case PieceType.ROOK:
-                    AfterMoveStateManager.updateRookState(tiles, rowPiece, colPiece);
+                    AfterMoveStateManager.updateRookState(tiles, rowPiece, colPiece, rowDest, colDest, currPiecePos);
                     break;
                 case PieceType.KING:
-                    AfterMoveStateManager.updateKingState(tiles, rowPiece, colPiece, rowDest, colDest);
+                    AfterMoveStateManager.updateKingState(tiles, rowPiece, colPiece, rowDest, colDest, currPiecePos);
                     break;
             }
 
             movesInARowNoCapture = ChessTools.getPieceType(tiles, rowDest, colDest) == null ?
                movesInARowNoCapture + 1 : 0; // Increment for 50 move rule
 
-            tiles[rowDest, colDest] = tiles[rowPiece, colPiece];
-            tiles[rowPiece, colPiece] = null;
-            gameResult = AfterMoveStateManager.updateBoardGeneral(tiles, isWhiteTurn, 
-                GetHashCode(), hashPosWhiteTurn, hashPosBlackTurn, movesInARowNoCapture);
+            gameResult = AfterMoveStateManager.updateBoardGeneral(tiles, isWhiteTurn, rowPiece, colPiece, rowDest, colDest,
+                GetHashCode(), hashPosWhiteTurn, hashPosBlackTurn, movesInARowNoCapture, currPiecePos);
+
+            oldPiecePositions.Push(currPiecePos);
+
             isWhiteTurn = !isWhiteTurn;
 
+        }
+
+        public bool unmove() {
+
+            if (oldPiecePositions.Count == 0) {
+                return false;
+            }
+
+            isWhiteTurn = !isWhiteTurn;
+            movesInARowNoCapture = 0; // TODO Needs fix
+            gameResult = new bool[] { false, false };
+            hashPosWhiteTurn = new Dictionary<int, int>();
+            hashPosBlackTurn = new Dictionary<int, int>();
+
+            Stack<Tuple<int, int, ChessPiece>> previousPiecePositions = oldPiecePositions.Pop();
+            
+
+            foreach (Tuple<int, int, ChessPiece> position in previousPiecePositions) {
+                int row = position.Item1;
+                int col = position.Item2;
+                ChessPiece piece = (ChessPiece)position.Item3;
+
+                Debug.Log($"Restoring piece at ({row}, {col}): {piece?.GetType()}");
+
+                tiles[row, col] = piece != null ? (ChessPiece)piece.Clone() : null;
+            }
+
+            DebugBoardState();
+
+            return true;
+
+        }
+
+        // Optional helper for debugging: prints the board state
+        private void DebugBoardState() {
+            string boardState = "";
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    boardState += tiles[i, j]?.GetType().Name ?? "null";
+                    boardState += " ";
+                }
+                boardState += "\n";
+            }
+            Debug.Log(boardState);
         }
 
         public override int GetHashCode() {

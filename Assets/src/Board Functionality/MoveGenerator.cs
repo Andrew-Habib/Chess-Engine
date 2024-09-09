@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Assets.src {
@@ -10,7 +11,7 @@ namespace Assets.src {
             if (!ChessTools.inbounds(row, col) || (gameResult.Length == 2 && 
                 (gameResult[0] == true || gameResult[1] == true)))
                 return new List<int[]>();
-
+            
             ChessPiece piece = board[row, col];
             List<int[]> moves = new();
 
@@ -127,7 +128,7 @@ namespace Assets.src {
             // Moving Forward - 1 Square (Maybe 2)
             if (ChessTools.emptyTile(board, row + dir, col)) { 
                 moves.Add(new int[] { row + dir, col });
-                // If the pawn has not moved yet, allow the pawnt to move up a second square
+                // If the pawn has not moved yet, allow the pawn to move up a second square
                 if (!((Pawn)piece).hasMoved() && ChessTools.emptyTile(board, row + 2 * dir, col))
                     moves.Add(new int[] { row + 2 * dir, col });
             }
