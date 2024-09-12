@@ -32,7 +32,7 @@ float materialScore(vector<vector<int>> position);
 float kingScore(vector<vector<int>> position);
 float mobilityScore(vector<vector<int>> position, int ind_d2pos, int ind_d3pos);
 float coordScore(vector<vector<int>> position);
-float piecePosScore(vector<vector<int>> position);
+float generalPiecePosScore(vector<vector<int>> position);
 float pawnStructureScore(vector<vector<int>> position);
 
 int main() {
@@ -147,10 +147,10 @@ float evaluatePos(vector<vector<int>> position, int ind_d2pos, int ind_d3pos) {
     float king_safety_score = kingScore(position);
     float mobility_score = mobilityScore(position, ind_d2pos, ind_d3pos);
     float coord_score = coordScore(position);
-    float piece_pos_score = piecePosScore(position);
+    float general_piece_pos_score = generalPiecePosScore(position);
     float pawn_structure_score = pawnStructureScore(position);
 
-    position_score = material_score + king_safety_score + mobility_score + coord_score + piece_pos_score + pawn_structure_score;
+    position_score = material_score + king_safety_score + mobility_score + coord_score + general_piece_pos_score + pawn_structure_score;
 
     return position_score;
 
@@ -277,7 +277,7 @@ float coordScore(vector<vector<int>> position) {
     return 0;
 }
 
-float piecePosScore(vector<vector<int>> position) {
+float generalPiecePosScore(vector<vector<int>> position) {
     float score = 0;
     vector<vector<float>> preferred_white_king_squares = {
         {0.2, 0.25, 0.1, 0, 0, 0.1, 0.25, 0.2},
@@ -305,9 +305,9 @@ float piecePosScore(vector<vector<int>> position) {
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0.1, 0.25, 0.1, 0.15, 0.15, 0.1, 0.25, 0.1},
         {0.1, 0.1, 0.15, 0.2, 0.2, 0.15, 0.1, 0.1},
-        {0.15, 0.15, 0.25, 0.2, 0.2, 0.25, 0.15, 0.15},
-        {0.15, 0, 0, 0, 0, 0, 0, 0.15},
-        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0.15, 0.15, 0.2, 0.2, 0.2, 0.2, 0.15, 0.15},
+        {0.15, 0.15, 0.2, 0.2, 0.2, 0.2, 0.15, 0.15},
+        {0.1, 0.1, 0.1, 0.15, 0.15, 0.1, 0.1, 0.1},
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0}
     };
@@ -315,20 +315,20 @@ float piecePosScore(vector<vector<int>> position) {
     vector<vector<float>> preferred_black_bishop_squares = {
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
+        {-0.1, -0.1, -0.1, -0.15, -0.15, -0.1, -0.1, -0.1},
+        {-0.15, -0.15, -0.2, -0.2, -0.2, -0.2, -0.15, -0.15},
+        {-0.15, -0.15, -0.2, -0.2, -0.2, -0.2, -0.15, -0.15},
+        {-0.1, -0.1, -0.15, -0.2, -0.2, -0.15, -0.1, -0.1},
+        {-0.1, -0.25, -0.1, -0.15, -0.15, -0.1, -0.25, -0.1},
         {0, 0, 0, 0, 0, 0, 0, 0}
     };
 
     vector<vector<float>> preferred_white_knight_squares = {
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0.05, 0.05, 0.1, 0.1, 0.05, 0.05, 0},
-        {0.1, 0.15, 0.25, 0.15, 0.15, 0.25, 0.15, 0.1},
-        {0.1, 0.15, 0.15, 0.35, 0.35, 0.15, 0.15, 0.1},
-        {0.1, 0.25, 0.15, 0.35, 0.35, 0.15, 0.25, 0.1},
+        {0.1, 0.15, 0.2, 0.15, 0.15, 0.2, 0.15, 0.1},
+        {0.1, 0.15, 0.15, 0.2, 0.2, 0.15, 0.15, 0.1},
+        {0.1, 0.2, 0.15, 0.2, 0.2, 0.15, 0.2, 0.1},
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0}
@@ -338,18 +338,86 @@ float piecePosScore(vector<vector<int>> position) {
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0},
-        {-0.1, -0.25, -0.15, -0.35, -0.35, -0.15, -0.25, -0.1},
-        {-0.1, -0.15, -0.15, -0.35, -0.35, -0.15, -0.15, -0.1},
+        {-0.1, -0.2, -0.15, -0.25, -0.25, -0.15, -0.2, -0.1},
+        {-0.1, -0.15, -0.15, -0.25, -0.25, -0.15, -0.15, -0.1},
         {-0.1, -0.15, -0.25, -0.15, -0.15, -0.25, -0.15, -0.1},
         {0, -0.05, -0.05, -0.1, -0.1, -0.05, -0.05, 0},
         {0, 0, 0, 0, 0, 0, 0, 0}
     };
 
+    vector<vector<float>> preferred_white_rook_squares = {
+        {0.1, 0.1, 0.15, 0.2, 0.2, 0.15, 0.1, 0.1},
+        {0.1, 0.1, 0.15, 0.2, 0.2, 0.15, 0.1, 0.1},
+        {0.1, 0.1, 0.15, 0.2, 0.2, 0.15, 0.1, 0.1},
+        {0.1, 0.1, 0.15, 0.2, 0.2, 0.15, 0.1, 0.1},
+        {0.1, 0.1, 0.15, 0.2, 0.2, 0.15, 0.1, 0.1},
+        {0.1, 0.1, 0.15, 0.2, 0.2, 0.15, 0.1, 0.1},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0}
+    };
 
+    vector<vector<float>> preferred_black_rook_squares = {
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {-0.1, -0.1, -0.15, -0.2, -0.2, -0.15, -0.1, -0.1},
+        {-0.1, -0.1, -0.15, -0.2, -0.2, -0.15, -0.1, -0.1},
+        {-0.1, -0.1, -0.15, -0.2, -0.2, -0.15, -0.1, -0.1},
+        {-0.1, -0.1, -0.15, -0.2, -0.2, -0.15, -0.1, -0.1},
+        {-0.1, -0.1, -0.15, -0.2, -0.2, -0.15, -0.1, -0.1},
+        {-0.1, -0.1, -0.15, -0.2, -0.2, -0.15, -0.1, -0.1}
+    };
+
+    vector<vector<float>> preferred_white_queen_squares = {
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0.1, 0.1, 0.1, 0.1, 0, 0},
+        {0, 0, 0.1, 0.2, 0.2, 0.1, 0, 0},
+        {0, 0, 0.1, 0.2, 0.2, 0.1, 0, 0},
+        {0, 0, 0.1, 0.1, 0.1, 0.1, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0}
+    };
+
+    vector<vector<float>> preferred_black_queen_squares = {
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, -0.1, -0.1, -0.1, -0.1, 0, 0},
+        {0, 0, -0.1, -0.2, -0.2, -0.1, 0, 0},
+        {0, 0, -0.1, -0.2, -0.2, -0.1, 0, 0},
+        {0, 0, -0.1, -0.1, -0.1, -0.1, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0}
+    };
+
+    vector<vector<float>> preferred_white_pawn_squares = {
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0.1, 0.2, 0.15, 0.15, 0.15, 0.15, 0.2, 0.1},
+        {0.1, 0.15, 0.2, 0.25, 0.25, 0.2, 0.15, 0.1},
+        {0.1, 0.15, 0.2, 0.25, 0.25, 0.2, 0.15, 0.1},
+        {1, 1, 1, 1, 1, 1, 1, 1},
+        {3, 3, 3, 3, 3, 3, 3, 3},
+        {0, 0, 0, 0, 0, 0, 0, 0}
+    };
+
+    vector<vector<float>> preferred_black_pawn_squares = {
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {-1, -1, -1, -1, -1, -1, -1, -1},
+        {-3, -3, -3, -3, -3, -3, -3, -3},
+        {-0.1, -0.15, -0.2, -0.25, -0.25, -0.2, -0.15, -0.1},
+        {-0.1, -0.15, -0.2, -0.25, -0.25, -0.2, -0.15, -0.1},
+        {-0.1, -0.2, -0.15, -0.15, -0.15, -0.15, -0.2, -0.1},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0}
+    };
 
     for (int i = 0; i < position.size(); i++) {
         for (int j = 0; j < position[i].size(); j++) {
-            if (position[i][j] == 1000) {
+            if (position[i][j] == 1) {
+                score = score + preferred_white_pawn_squares[i][j];
+            } else if (position[i][j] == -1) {
+                score = score + preferred_black_pawn_squares[i][j];
+            } else if (position[i][j] == 1000) {
                 score = score + preferred_white_king_squares[i][j];
             } else if (position[i][j] == -1000) {
                 score = score + preferred_black_king_squares[i][j];
@@ -361,7 +429,15 @@ float piecePosScore(vector<vector<int>> position) {
                 score = score + preferred_white_knight_squares[i][j];
             } else if (position[i][j] == -3) {
                 score = score + preferred_black_knight_squares[i][j];
-            }
+            } else if (position[i][j] == 5) {
+                score = score + preferred_white_rook_squares[i][j];
+            } else if (position[i][j] == -5) {
+                score = score + preferred_black_rook_squares[i][j];
+            } else if (position[i][j] == 9) {
+                score = score + preferred_white_queen_squares[i][j];
+            } else if (position[i][j] == -9) {
+                score = score + preferred_black_queen_squares[i][j];
+            } 
         }
     }
     return score;
