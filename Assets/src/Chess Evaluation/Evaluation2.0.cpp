@@ -1,11 +1,13 @@
 // Base researched criteria (Material, King Safety, Space, Mobility (could be similar to space), Piece Coordination, Pawn structure)
 // Personal additions: Forced combination advantage (search will do this), Piece positioning, passed pawns
 // Will use principle evaluation ideas + extensions/customizations but with unique methods and weights
+// https://chatgpt.com/ used for idea generation for optimizations
+// Credits to https://github.com/nkarve/surge for fast bitboard legal chess move generator and zobrist hashing (Stockfish Wrapper)
+// Used Stockfish Engine 17 Open Source Chess Engine for efficient UCI and benchmarking https://stockfishchess.org/
 // Source: https://chessify.me/blog/chess-engine-evaluation
 // Check pieces around the king
-// Credits to Disservin: https://github.com/Disservin/chess-library/blob/master/include/chess.hpp
-// https://www.netlib.org/utk/lsi/pcwLSI/text/node343.html#:~:text=King%20safety%20is%20evaluated%20by,in%20front%20of%20the%20king.
 // Alpha beta pruning + minimax aglorithm https://www.youtube.com/watch?v=l-hh51ncgDI
+
 
 #include <iostream>
 #include <fstream>
@@ -13,6 +15,12 @@
 #include <sstream>
 #include <cmath>
 #include <string>
+#include <unordered_set>
+#include <unordered_map>
+
+#include "./surge/src/position.h"
+#include "./surge/src/tables.h"
+#include "./surge/src/types.h"
 
 using namespace std;
 
@@ -20,10 +28,11 @@ using namespace std;
 bool whiteTurn = true; // Is it white or black's turn
 //vector<vector<vector<int>>> d3Positions; // All positions at Depth of 3 nodes in a tree
 vector<vector<int>> numd3pos; // Number of moves possible at Depth 2. .size for number of depth 1 positions
+unordered_map<uint64_t, float> transpositionTable;
 
 //d2 has how many d3 and d1 has how many d2
 
-vector<vector<vector<vector<vector<int>>>>> interpretD3PosTxt(); // Outer d1, 2nd d2 pos, 3rd d3 pos
+void generate_positions(Position& p, int depth, unordered_set<string>& positions);
 float evaluatePos(vector<vector<int>> position, int ind_d2pos, int ind_d3pos);
 float alphaBetaPruneD3Positions(vector<vector<vector<vector<vector<int>>>>> pos);
 float materialScore(vector<vector<int>> position);
@@ -34,107 +43,62 @@ float generalPiecePosScore(vector<vector<int>> position);
 float pawnStructureScore(vector<vector<int>> position);
 
 int main() {
-    vector<vector<vector<vector<vector<int>>>>> pos = interpretD3PosTxt();
-    float evalBest = alphaBetaPruneD3Positions(pos);
-    cout << evalBest << "\n";
+    initialise_all_databases();
+    zobrist::initialise_zobrist_keys();
 
-    for (int i = 0; i < numd3pos.size(); i++) {
-        cout << "Depth 2 Moves for Position " << i + 1 << ": ";
-        for (int j = 0; j < numd3pos[i].size(); j++) {
-            cout << numd3pos[i][j] << " ";
-        }
-        cout << endl;
-    }
+    Position p;
+    p.set("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -", p);  // Set the starting position
+
+    int depth = 4;
+    unordered_set<string> all_positions;
+
+    generate_positions(p, depth, all_positions);
+
+    cout << "Total positions at depth " << depth << ": " << all_positions.size() << std::endl;
+
+    //// Output the positions (in FEN format)
+    //for (const string& fen : all_positions) {
+    //    cout << fen << endl;
+    //}
+
+    cout << all_positions.size() << endl;
+
     return 0;
 }
 
-vector<vector<vector<vector<vector<int>>>>> interpretD3PosTxt() {
-    ifstream file("../../../data.txt");
-    string line;
+void generate_positions(Position& p, int depth, unordered_set<string>& positions) {
 
-    vector<vector<vector<vector<vector<int>>>>> d0Positions;
-    vector<vector<vector<vector<int>>>> d1Positions; // Outer vector for depths
-    vector<vector<vector<int>>> d2Positions; // Vector for Depth 2 positions
-    vector<vector<int>> d3Position; // 2D vector representing the board
-    vector<int> currentRow; // 1D vector representing a row of the board
-    
-    vector<int> d1numd2;
-    int d2numd3 = 0;
-
-    if (!file) {
-        cerr << "Unable to open file";
+    if (depth == 0) {
+        positions.insert(p.fen());
+        return;
     }
 
-    while (getline(file, line)) {
-        if (line.empty()) {
-            continue;
-        }
+    uint64_t zKey = p.get_hash();
 
-        if (line.find("10") != string::npos) {
-            whiteTurn = true;
-        }
-        else if (line.find("-10") != string::npos) {
-            whiteTurn = false;
-        }
+    if (transpositionTable.find(zKey) != transpositionTable.end()) {
+       /* std::cout << "Position already evaluated with score: " << transpositionTable[zKey] << std::endl;*/
+    } else {
+        float evaluation = 0;
+        transpositionTable[zKey] = evaluation;
+        /*std::cout << "Evaluated position with score: " << evaluation << std::endl;*/
+    }
 
-        if (line.find("111") != string::npos) {
-            numd3pos.push_back(d1numd2);
-            if (!d1Positions.empty()) {
-                d0Positions.push_back(d1Positions);
-            }
-            d1Positions.clear();
-            d1numd2.clear();
-            continue;
+    if (p.turn() == Color::WHITE) {
+        MoveList<WHITE> list(p);
+        for (Move m : list) {
+            p.play<WHITE>(m);
+            generate_positions(p, depth - 1, positions);
+            p.undo<WHITE>(m);
         }
-
-        if (line.find("222") != string::npos) {
-            d1numd2.push_back(d2numd3);
-            if (!d2Positions.empty()) {
-                d1Positions.push_back(d2Positions);
-            }
-            d2Positions.clear();
-            d2numd3 = 0;
-            continue;
-        }
-
-        if (line == "|") {
-            d2numd3++;
-            if (!d3Position.empty()) {
-                d2Positions.push_back(d3Position);
-            }
-            d3Position.clear();
-            continue;
-        }
-
-        istringstream iss(line);
-        string value;
-        currentRow.clear();
-        while (getline(iss, value, ',')) {
-            currentRow.push_back(stoi(value));
-        }
-
-        if (!d3Position.empty() && currentRow.size() == d3Position[0].size()) {
-            d3Position.push_back(currentRow);
-        }
-        else {
-            if (!d3Position.empty()) {
-                d2Positions.push_back(d3Position);
-            }
-            d3Position.clear();
-            d3Position.push_back(currentRow);
+    } else {
+        MoveList<BLACK> list(p);
+        for (Move m : list) {
+            p.play<BLACK>(m);
+            generate_positions(p, depth - 1, positions);
+            p.undo<BLACK>(m);
         }
     }
 
-    if (!d3Position.empty()) {
-        d2Positions.push_back(d3Position);
-    }
-    if (!d2Positions.empty()) {
-        d1Positions.push_back(d2Positions);
-    }
-
-    file.close();
-
-    return d0Positions;
 }
 
 float evaluatePos(vector<vector<int>> position, int ind_d2pos, int ind_d3pos) {
