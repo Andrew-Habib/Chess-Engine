@@ -7,6 +7,7 @@
 // Source: https://chessify.me/blog/chess-engine-evaluation
 // Check pieces around the king
 // Alpha beta pruning + minimax aglorithm https://www.youtube.com/watch?v=l-hh51ncgDI
+// For board scores
 
 #include <iostream>
 #include <fstream>
@@ -17,6 +18,8 @@
 #include <algorithm>
 #include <unordered_set>
 #include <unordered_map>
+#include <utility>
+#include <iomanip>
 
 #include "./surge/src/position.h"
 #include "./surge/src/tables.h"
@@ -25,48 +28,53 @@
 using namespace std;
 
 bool whiteTurn = true; // Is it white or black's turn
-unordered_map<uint64_t, float> transpositionTable;
 
-float alphabetaPrunePositions(Position& p, int depth, unordered_set<string>& positions, float alpha, float beta);
+// Define a pair for evaluation and best move
+using EvalMovePair = std::pair<float, Move>;
+
+unordered_map<uint64_t, EvalMovePair> transpositionTable;
+
+void EvaluationSequence();
+EvalMovePair alphabetaPrunePositions(Position& p, int depth, unordered_set<string>& positions, float alpha, float beta);
 float evaluatePos(Position& position);
-float materialScore(Position& position);
+float pieceScore(Position& position);
 float kingScore(Position& position);
 float mobilityScore(Position& position);
 float coordScore(Position& position);
-float generalPiecePosScore(Position& position);
 float pawnStructureScore(Position& position);
 
 int main() {
+    EvaluationSequence();
+    return 0;
+}
+
+void EvaluationSequence() {
     initialise_all_databases();
     zobrist::initialise_zobrist_keys();
 
     Position p;
-    p.set("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -", p);
+    p.set("kbK5/pp6/1P6/8/8/8/8/R7 w - - 0 1", p);
 
-    whiteTurn = p.turn() == Color::WHITE;
+    whiteTurn = p.turn() == WHITE;
 
-    int depth = 10;
+    int depth = 8;
     unordered_set<string> all_positions;
 
-    alphabetaPrunePositions(p, depth, all_positions, -100000, 100000);
+    EvalMovePair bestMoveResult = alphabetaPrunePositions(p, depth, all_positions, -100000, 100000);
+
+    cout << fixed << setprecision(2);
+    cout << "Board: \n" << p << endl;
+    cout << "Best score: " << bestMoveResult.first << endl;
+    cout << "Best move: " << bestMoveResult.second << endl;
 
     cout << "Total positions at depth " << depth << ": " << all_positions.size() << std::endl;
-
-    // Output the positions (in FEN format)
-    /*for (const string& fen : all_positions) {
-        cout << fen << endl;
-    }*/
-
-    cout << all_positions.size() << endl;
-
-    return 0;
 }
 
-float alphabetaPrunePositions(Position& p, int depth, unordered_set<string>& positions, float alpha, float beta) {
+EvalMovePair alphabetaPrunePositions(Position& p, int depth, unordered_set<string>& positions, float alpha, float beta) {
 
     if (depth == 0) {
         positions.insert(p.fen());
-        return evaluatePos(p);
+        return { evaluatePos(p), Move() };  // Return evaluation and an empty move
     }
 
     uint64_t zKey = p.get_hash();
@@ -75,70 +83,281 @@ float alphabetaPrunePositions(Position& p, int depth, unordered_set<string>& pos
         return transpositionTable[zKey];
     }
 
-    if (p.turn() == Color::WHITE) { // Max Player
-        float extEval = -100000;
+    Move bestMove;
+    float extEval = (p.turn() == WHITE) ? -100000 : 100000;
+
+    if (p.turn() == WHITE) { // Max Player
         MoveList<WHITE> list(p);
         for (Move m : list) {
             p.play<WHITE>(m);
-            float eval = alphabetaPrunePositions(p, depth - 1, positions, alpha, beta);
-            extEval = max(extEval, eval);
+            EvalMovePair result = alphabetaPrunePositions(p, depth - 1, positions, alpha, beta);
+            float eval = result.first;
+            if (eval > extEval) {
+                extEval = eval;
+                bestMove = m;
+            }
             alpha = max(alpha, extEval);
             p.undo<WHITE>(m);
-            if (beta <= alpha) break;    
+            if (beta <= alpha) break;
         }
-        return extEval;
-    } else { // Min Player
-        float extEval = 100000;
+    }
+    else { // Min Player
         MoveList<BLACK> list(p);
         for (Move m : list) {
             p.play<BLACK>(m);
-            float eval = alphabetaPrunePositions(p, depth - 1, positions, alpha, beta);
-            extEval = min(extEval, eval);
+            EvalMovePair result = alphabetaPrunePositions(p, depth - 1, positions, alpha, beta);
+            float eval = result.first;
+            if (eval < extEval) {
+                extEval = eval;
+                bestMove = m;
+            }
             beta = min(beta, extEval);
             p.undo<BLACK>(m);
-            if (beta <= alpha) break;            
+            if (beta <= alpha) break;
         }
-
-        transpositionTable[zKey] = extEval;
-        return extEval;
     }
 
+    transpositionTable[zKey] = { extEval, bestMove };  // Store evaluation and move
+    return transpositionTable[zKey];
 }
+
 
 float evaluatePos(Position& position) {
 
     float position_score = 0;
 
-    /*float material_score = materialScore(position);
+    float piece_score = pieceScore(position);
     float king_safety_score = kingScore(position);
     float mobility_score = mobilityScore(position);
     float coord_score = coordScore(position);
-    float general_piece_pos_score = generalPiecePosScore(position);
     float pawn_structure_score = pawnStructureScore(position);
 
-    position_score = material_score + king_safety_score + mobility_score + coord_score + general_piece_pos_score + pawn_structure_score;*/
+    position_score = piece_score + king_safety_score + mobility_score + coord_score + pawn_structure_score;
 
     return position_score;
 
 }
 
-float materialScore(Position& position) {
+float pieceScore(Position& position) {
 
     float score = 0;
     string positionFen = position.fen();
-    return score;
+    string boardFen = positionFen.substr(0, positionFen.find(' '));
 
+    // https://www.freecodecamp.org/news/simple-chess-ai-step-by-step-1d55a9266977 Source for these values
+
+    vector<vector<float>> preferred_white_pawn_squares = {
+        { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0},
+        { 5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0},
+        { 1.0,  1.0,  2.0,  3.0,  3.0,  2.0,  1.0,  1.0},
+        { 0.5,  0.5,  1.0,  2.5,  2.5,  1.0,  0.5,  0.5},
+        { 0.0,  0.0,  0.0,  2.0,  2.0,  0.0,  0.0,  0.0},
+        { 0.5, -0.5, -1.0,  0.0,  0.0, -1.0, -0.5,  0.5},
+        { 0.5,  1.0,  1.0, -2.0, -2.0,  1.0,  1.0,  0.5},
+        { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}
+    };
+
+    vector<vector<float>> preferred_black_pawn_squares = {
+        { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0},
+        {-0.5, -1.0, -1.0,  2.0,  2.0,-1.0,  -1.0, -0.5},
+        {-0.5,  0.5,  1.0,  0.0,  0.0,  1.0,  0.5, -0.5},
+        { 0.0,  0.0,  0.0, -2.0, -2.0,  0.0,  0.0,  0.0},
+        {-0.5, -0.5, -1.0, -2.5, -2.5, -1.0, -0.5, -0.5},
+        {-1.0, -1.0, -2.0, -3.0, -3.0, -2.0, -1.0, -1.0},
+        {-5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0},
+        { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}
+    };
+
+
+
+    vector<vector<float>> preferred_white_bishop_squares = {
+        {-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0},
+        {-1.0,  1.0,  0.0,  0.0,  0.0,  0.0,  1.0, -1.0},
+        {-1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0},
+        {-1.0,  0.0,  1.0,  1.0,  1.0,  1.0,  0.0, -1.0},
+        {-1.0,  0.5,  0.5,  1.0,  1.0,  0.5,  0.5, -1.0},
+        {-1.0,  0.0,  0.5,  1.0,  1.0,  0.5,  0.0, -1.0},
+        {-1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0},
+        {-2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0}
+    };
+
+    vector<vector<float>> preferred_black_bishop_squares = {
+        { 2.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  2.0},
+        { 1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1.0},
+        { 1.0,  0.0, -0.5, -1.0, -1.0, -0.5,  0.0,  1.0},
+        { 1.0, -0.5, -0.5, -1.0, -1.0, -0.5, -0.5,  1.0},
+        { 1.0,  0.0, -1.0, -1.0, -1.0, -1.0,  0.0,  1.0},
+        { 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0,  1.0},
+        { 1.0, -1.0,  0.0,  0.0,  0.0,  0.0, -1.0,  1.0},
+        { 2.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  2.0}
+    };
+
+    vector<vector<float>> preferred_white_knight_squares = {
+        {-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0},
+        {-4.0, -2.0,  0.0,  0.0,  0.0,  0.0, -2.0, -4.0},
+        {-3.0,  0.0,  1.0,  1.5,  1.5,  1.0,  0.0, -3.0},
+        {-3.0,  0.5,  1.5,  2.0,  2.0,  1.5,  0.5, -3.0},
+        {-3.0,  0.0,  1.5,  2.0,  2.0,  1.5,  0.0, -3.0},
+        {-3.0,  0.5,  1.0,  1.5,  1.5,  1.0,  0.5, -3.0},
+        {-4.0, -2.0,  0.0,  0.5,  0.5,  0.0, -2.0, -4.0},
+        {-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0}
+    };
+
+    vector<vector<float>> preferred_black_knight_squares = {
+        {5.0, 4.0, 3.0, 3.0, 3.0, 3.0, 4.0, 5.0},
+        {4.0, 2.0, 0.0, 0.0, 0.0, 0.0, 2.0, 4.0},
+        {3.0, 0.0,-1.0,-1.5,-1.5,-1.0, 0.0, 3.0},
+        {3.0,-0.5,-1.5,-2.0,-2.0,-1.5,-0.5, 3.0},
+        {3.0, 0.0,-1.5,-2.0,-2.0,-1.5, 0.0, 3.0},
+        {3.0,-0.5,-1.0,-1.5,-1.5,-1.0,-0.5, 3.0},
+        {4.0, 2.0, 0.0,-0.5,-0.5, 0.0, 2.0, 4.0},
+        {5.0, 4.0, 3.0, 3.0, 3.0, 3.0, 4.0, 5.0}
+    };
+
+    vector<vector<float>> preferred_white_rook_squares = {
+        { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0},
+        { 0.5,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  0.5},
+        {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
+        {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
+        {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
+        {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
+        {-0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5},
+        { 0.0,  0.0,  0.0,  0.5,  0.5,  0.0,  0.0,  0.0}
+    };
+
+    vector<vector<float>> preferred_black_rook_squares = {
+        { 0.0,  0.0,  0.0, -0.5, -0.5,  0.0,  0.0,  0.0},
+        { 0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5},
+        { 0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5},
+        { 0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5},
+        { 0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5},
+        { 0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.5},
+        {-0.5, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -0.5},
+        { 0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0}
+    };
+
+    vector<vector<float>> preferred_white_queen_squares = {
+        {-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0},
+        {-1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0},
+        {-1.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0},
+        {-0.5,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5},
+        { 0.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5},
+        {-1.0,  0.5,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0},
+        {-1.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0, -1.0},
+        {-2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0}
+    };
+
+    vector<vector<float>> preferred_black_queen_squares = {
+        { 2.0,  1.0,  1.0,  0.5,  0.5,  1.0,  1.0,  2.0},
+        { 1.0,  0.0, -0.5,  0.0,  0.0,  0.0,  0.0,  1.0},
+        { 1.0, -0.5, -0.5, -0.5, -0.5, -0.5,  0.0,  1.0},
+        { 0.0,  0.0, -0.5, -0.5, -0.5, -0.5,  0.0,  0.5},
+        { 0.5,  0.0, -0.5, -0.5, -0.5, -0.5,  0.0,  0.5},
+        { 1.0,  0.0, -0.5, -0.5, -0.5, -0.5,  0.0,  1.0},
+        { 1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  1.0},
+        { 2.0,  1.0,  1.0,  0.5,  0.5,  1.0,  1.0,  2.0}
+    };
+
+    vector<vector<float>> preferred_white_king_squares = {
+        { 2.0,  3.0,  1.0,  0.0,  0.0,  1.0,  3.0,  2.0},
+        { 2.0,  2.0,  0.0,  0.0,  0.0,  0.0,  2.0,  2.0},
+        {-1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0},
+        {-2.0, -3.0, -3.0, -1.0, -1.0, -3.0, -3.0, -2.0},
+        {-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0},
+        {-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0},
+        {-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0},
+        {-3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0}
+    };
+
+    vector<vector<float>> preferred_black_king_squares = {
+        { 3.0,  4.0,  4.0,  5.0,  5.0,  4.0,  4.0,  3.0},
+        { 3.0,  4.0,  4.0,  5.0,  5.0,  4.0,  4.0,  3.0},
+        { 3.0,  4.0,  4.0,  5.0,  5.0,  4.0,  4.0,  3.0},
+        { 3.0,  4.0,  4.0,  5.0,  5.0,  4.0,  4.0,  3.0},
+        { 2.0,  3.0,  3.0,  4.0,  4.0,  3.0,  3.0,  2.0},
+        { 1.0,  2.0,  2.0,  2.0,  2.0,  2.0,  2.0,  1.0},
+        {-2.0, -3.0, -1.0,  0.0,  0.0, -1.0, -3.0, -2.0},
+        {-2.0, -2.0,  0.0,  0.0,  0.0,  0.0, -2.0, -2.0}
+    };
+
+    int rank = 7, file = 0;
+    int adjFactorPos = 1;
+
+    for (char piece : boardFen) {
+        if (isdigit(piece)) {
+            file += piece - '0';
+        }
+        else if (piece == '/') {
+            rank--;
+            file = 0;
+        }
+        else {
+            if (piece == 'P') {
+                score = score + 1;
+                score = score + preferred_white_pawn_squares[rank][file] * adjFactorPos;
+            }
+            else if (piece == 'p') {
+                score = score - 1;
+                score = score + preferred_black_pawn_squares[rank][file] * adjFactorPos;
+            }
+            else if (piece == 'K') {
+                score = score + 1000;
+                score = score + preferred_white_king_squares[rank][file] * adjFactorPos;
+            }
+            else if (piece == 'k') {
+                score = score - 1000;
+                score = score + preferred_black_king_squares[rank][file] * adjFactorPos;
+            }
+            else if (piece == 'B') {
+                score = score + 3.15;
+                score = score + preferred_white_bishop_squares[rank][file] * adjFactorPos;
+            }
+            else if (piece == 'b') {
+                score = score - 3.15;
+                score = score + preferred_black_bishop_squares[rank][file] * adjFactorPos;
+            }
+            else if (piece == 'N') {
+                score = score + 3;
+                score = score + preferred_white_knight_squares[rank][file] * adjFactorPos;
+            }
+            else if (piece == 'n') {
+                score = score - 3;
+                score = score + preferred_black_knight_squares[rank][file] * adjFactorPos;
+            }
+            else if (piece == 'R') {
+                score = score + 5;
+                score = score + preferred_white_rook_squares[rank][file] * adjFactorPos;
+            }
+            else if (piece == 'r') {
+                score = score - 5;
+                score = score + preferred_black_rook_squares[rank][file] * adjFactorPos;
+            }
+            else if (piece == 'Q') {
+                score = score + 9;
+                score = score + preferred_white_queen_squares[rank][file] * adjFactorPos;
+            }
+            else if (piece == 'q') {
+                score = score - 9;
+                score = score + preferred_black_queen_squares[rank][file] * adjFactorPos;
+            }
+            file++;
+        }
+    }
+    return score;
 }
 
 float kingScore(Position& position) {
     float score = 0;
-    
+    string boardFen = position.fen();
     return score;
 }
 
 float mobilityScore(Position& position) {
-    float adjustment_factor = whiteTurn ? 0.1 : -0.1;
     float score = 0;
+    MoveList<WHITE> listWhiteMoves(position);
+    score = listWhiteMoves.size() * 0.05;
+    MoveList<BLACK> listBlackMoves(position);
+    score = score - listBlackMoves.size() * (0.05);
     return score;
 }
 
@@ -146,171 +365,7 @@ float coordScore(Position& position) {
     return 0;
 }
 
-float generalPiecePosScore(Position& position) {
-    float score = 0;
-    vector<vector<float>> preferred_white_king_squares = {
-        {0.2, 0.25, 0.1, 0, 0, 0.1, 0.25, 0.2},
-        {-0.2, -0.2, -0.2, -0.2, -0.2, -0.2, -0.2, -0.2},
-        {-0.5, -0.5, -0.5, -0.25, -0.25, -0.5, -0.5, -0.5},
-        {-1, -1, -1, -1, -1, -1, -1, -1},
-        {-2, -2, -2, -2, -2, -2, -2, -2},
-        {-3, -3, -3, -3, -3, -3, -3, -3},
-        {-4, -4, -4, -4, -4, -4, -4, -4},
-        {-5, -5, -5, -5, -5, -5, -5, -5}
-    };
 
-    vector<vector<float>> preferred_black_king_squares = {
-        {5, 5, 5, 5, 5, 5, 5, 5},
-        {4, 4, 4, 4, 4, 4, 4, 4},
-        {3, 3, 3, 3, 3, 3, 3, 3},
-        {2, 2, 2, 2, 2, 2, 2, 2},
-        {1, 1, 1, 1, 1, 1, 1, 1},
-        {0.5, 0.5, 0.5, 0.25, 0.25, 0.5, 0.5, 0.5},
-        {0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2},
-        {-0.2, -0.25, -0.1, 0, 0, -0.1, -0.25, -0.2}
-    };
-
-    vector<vector<float>> preferred_white_bishop_squares = {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0.1, 0.25, 0.1, 0.15, 0.15, 0.1, 0.25, 0.1},
-        {0.1, 0.1, 0.15, 0.2, 0.2, 0.15, 0.1, 0.1},
-        {0.15, 0.15, 0.2, 0.2, 0.2, 0.2, 0.15, 0.15},
-        {0.15, 0.15, 0.2, 0.2, 0.2, 0.2, 0.15, 0.15},
-        {0.1, 0.1, 0.1, 0.15, 0.15, 0.1, 0.1, 0.1},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0}
-    };
-
-    vector<vector<float>> preferred_black_bishop_squares = {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {-0.1, -0.1, -0.1, -0.15, -0.15, -0.1, -0.1, -0.1},
-        {-0.15, -0.15, -0.2, -0.2, -0.2, -0.2, -0.15, -0.15},
-        {-0.15, -0.15, -0.2, -0.2, -0.2, -0.2, -0.15, -0.15},
-        {-0.1, -0.1, -0.15, -0.2, -0.2, -0.15, -0.1, -0.1},
-        {-0.1, -0.25, -0.1, -0.15, -0.15, -0.1, -0.25, -0.1},
-        {0, 0, 0, 0, 0, 0, 0, 0}
-    };
-
-    vector<vector<float>> preferred_white_knight_squares = {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0.05, 0.05, 0.1, 0.1, 0.05, 0.05, 0},
-        {0.1, 0.15, 0.2, 0.15, 0.15, 0.2, 0.15, 0.1},
-        {0.1, 0.15, 0.15, 0.2, 0.2, 0.15, 0.15, 0.1},
-        {0.1, 0.2, 0.15, 0.2, 0.2, 0.15, 0.2, 0.1},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0}
-    };
-
-    vector<vector<float>> preferred_black_knight_squares = {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {-0.1, -0.2, -0.15, -0.25, -0.25, -0.15, -0.2, -0.1},
-        {-0.1, -0.15, -0.15, -0.25, -0.25, -0.15, -0.15, -0.1},
-        {-0.1, -0.15, -0.25, -0.15, -0.15, -0.25, -0.15, -0.1},
-        {0, -0.05, -0.05, -0.1, -0.1, -0.05, -0.05, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0}
-    };
-
-    vector<vector<float>> preferred_white_rook_squares = {
-        {0.1, 0.1, 0.15, 0.2, 0.2, 0.15, 0.1, 0.1},
-        {0.1, 0.1, 0.15, 0.2, 0.2, 0.15, 0.1, 0.1},
-        {0.1, 0.1, 0.15, 0.2, 0.2, 0.15, 0.1, 0.1},
-        {0.1, 0.1, 0.15, 0.2, 0.2, 0.15, 0.1, 0.1},
-        {0.1, 0.1, 0.15, 0.2, 0.2, 0.15, 0.1, 0.1},
-        {0.1, 0.1, 0.15, 0.2, 0.2, 0.15, 0.1, 0.1},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0}
-    };
-
-    vector<vector<float>> preferred_black_rook_squares = {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {-0.1, -0.1, -0.15, -0.2, -0.2, -0.15, -0.1, -0.1},
-        {-0.1, -0.1, -0.15, -0.2, -0.2, -0.15, -0.1, -0.1},
-        {-0.1, -0.1, -0.15, -0.2, -0.2, -0.15, -0.1, -0.1},
-        {-0.1, -0.1, -0.15, -0.2, -0.2, -0.15, -0.1, -0.1},
-        {-0.1, -0.1, -0.15, -0.2, -0.2, -0.15, -0.1, -0.1},
-        {-0.1, -0.1, -0.15, -0.2, -0.2, -0.15, -0.1, -0.1}
-    };
-
-    vector<vector<float>> preferred_white_queen_squares = {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0.1, 0.1, 0.1, 0.1, 0, 0},
-        {0, 0, 0.1, 0.2, 0.2, 0.1, 0, 0},
-        {0, 0, 0.1, 0.2, 0.2, 0.1, 0, 0},
-        {0, 0, 0.1, 0.1, 0.1, 0.1, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0}
-    };
-
-    vector<vector<float>> preferred_black_queen_squares = {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, -0.1, -0.1, -0.1, -0.1, 0, 0},
-        {0, 0, -0.1, -0.2, -0.2, -0.1, 0, 0},
-        {0, 0, -0.1, -0.2, -0.2, -0.1, 0, 0},
-        {0, 0, -0.1, -0.1, -0.1, -0.1, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0}
-    };
-
-    vector<vector<float>> preferred_white_pawn_squares = {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0.1, 0.2, 0.15, 0.15, 0.15, 0.15, 0.2, 0.1},
-        {0.1, 0.15, 0.2, 0.25, 0.25, 0.2, 0.15, 0.1},
-        {0.1, 0.15, 0.2, 0.25, 0.25, 0.2, 0.15, 0.1},
-        {1, 1, 1, 1, 1, 1, 1, 1},
-        {3, 3, 3, 3, 3, 3, 3, 3},
-        {0, 0, 0, 0, 0, 0, 0, 0}
-    };
-
-    vector<vector<float>> preferred_black_pawn_squares = {
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {-1, -1, -1, -1, -1, -1, -1, -1},
-        {-3, -3, -3, -3, -3, -3, -3, -3},
-        {-0.1, -0.15, -0.2, -0.25, -0.25, -0.2, -0.15, -0.1},
-        {-0.1, -0.15, -0.2, -0.25, -0.25, -0.2, -0.15, -0.1},
-        {-0.1, -0.2, -0.15, -0.15, -0.15, -0.15, -0.2, -0.1},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0}
-    };
-
-    /*for (int i = 0; i < position.size(); i++) {
-        for (int j = 0; j < position[i].size(); j++) {
-            if (position[i][j] == 1) {
-                score = score + preferred_white_pawn_squares[i][j];
-            } else if (position[i][j] == -1) {
-                score = score + preferred_black_pawn_squares[i][j];
-            } else if (position[i][j] == 1000) {
-                score = score + preferred_white_king_squares[i][j];
-            } else if (position[i][j] == -1000) {
-                score = score + preferred_black_king_squares[i][j];
-            } else if (position[i][j] == 4) {
-                score = score + preferred_white_bishop_squares[i][j];
-            } else if (position[i][j] == -4) {
-                score = score + preferred_black_bishop_squares[i][j];
-            } else if (position[i][j] == 3) {
-                score = score + preferred_white_knight_squares[i][j];
-            } else if (position[i][j] == -3) {
-                score = score + preferred_black_knight_squares[i][j];
-            } else if (position[i][j] == 5) {
-                score = score + preferred_white_rook_squares[i][j];
-            } else if (position[i][j] == -5) {
-                score = score + preferred_black_rook_squares[i][j];
-            } else if (position[i][j] == 9) {
-                score = score + preferred_white_queen_squares[i][j];
-            } else if (position[i][j] == -9) {
-                score = score + preferred_black_queen_squares[i][j];
-            } 
-        }
-    }*/
-    return score;
-}
 
 float pawnStructureScore(Position& position) {
     return 0;
