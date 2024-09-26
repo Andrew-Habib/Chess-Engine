@@ -16,9 +16,8 @@
 #include <cmath>
 #include <string>
 #include <algorithm>
-#include <unordered_set>
 #include <unordered_map>
-#include <utility>
+#include <tuple>
 #include <iomanip>
 
 #include "./surge/src/position.h"
@@ -30,12 +29,12 @@ using namespace std;
 bool whiteTurn = true; // Is it white or black's turn
 
 // Define a pair for evaluation and best move
-using EvalMovePair = std::pair<float, Move>;
+using EvalMoveTuple = tuple<float, Move>;
 
-unordered_map<uint64_t, EvalMovePair> transpositionTable;
+unordered_map<uint64_t, EvalMoveTuple> transpositionTable;
 
 void EvaluationSequence();
-EvalMovePair alphabetaPrunePositions(Position& p, int depth, unordered_set<string>& positions, float alpha, float beta);
+EvalMoveTuple alphabetaPrunePositions(Position& p, int depth, float alpha, float beta);
 float evaluatePos(Position& position);
 float pieceScore(Position& position);
 float kingScore(Position& position);
@@ -53,27 +52,25 @@ void EvaluationSequence() {
     zobrist::initialise_zobrist_keys();
 
     Position p;
-    p.set("kbK5/pp6/1P6/8/8/8/8/R7 w - - 0 1", p);
+    p.set("3K4/Pp1p1N1n/bpPppk1P/PN2pp2/1p1P1PBb/2RPB2q/3Pn3/1r1Q2Rr b - - 0 1", p);
 
     whiteTurn = p.turn() == WHITE;
 
-    int depth = 8;
-    unordered_set<string> all_positions;
+    int depth = 6;
 
-    EvalMovePair bestMoveResult = alphabetaPrunePositions(p, depth, all_positions, -100000, 100000);
+    EvalMoveTuple bestMoveResult = alphabetaPrunePositions(p, depth, -100000, 100000);
 
     cout << fixed << setprecision(2);
     cout << "Board: \n" << p << endl;
-    cout << "Best score: " << bestMoveResult.first << endl;
-    cout << "Best move: " << bestMoveResult.second << endl;
+    cout << "Best score: " << get<0>(bestMoveResult) << endl;
+    cout << "Best move: " << get<1>(bestMoveResult) << endl;
 
-    cout << "Total positions at depth " << depth << ": " << all_positions.size() << std::endl;
+    cout << "Total positions at depth " << depth << ": " << transpositionTable.size() << std::endl;
 }
 
-EvalMovePair alphabetaPrunePositions(Position& p, int depth, unordered_set<string>& positions, float alpha, float beta) {
+EvalMoveTuple alphabetaPrunePositions(Position& p, int depth, float alpha, float beta) {
 
     if (depth == 0) {
-        positions.insert(p.fen());
         return { evaluatePos(p), Move() };  // Return evaluation and an empty move
     }
 
@@ -90,8 +87,8 @@ EvalMovePair alphabetaPrunePositions(Position& p, int depth, unordered_set<strin
         MoveList<WHITE> list(p);
         for (Move m : list) {
             p.play<WHITE>(m);
-            EvalMovePair result = alphabetaPrunePositions(p, depth - 1, positions, alpha, beta);
-            float eval = result.first;
+            EvalMoveTuple result = alphabetaPrunePositions(p, depth - 1, alpha, beta);
+            float eval = get<0>(result);
             if (eval > extEval) {
                 extEval = eval;
                 bestMove = m;
@@ -105,8 +102,8 @@ EvalMovePair alphabetaPrunePositions(Position& p, int depth, unordered_set<strin
         MoveList<BLACK> list(p);
         for (Move m : list) {
             p.play<BLACK>(m);
-            EvalMovePair result = alphabetaPrunePositions(p, depth - 1, positions, alpha, beta);
-            float eval = result.first;
+            EvalMoveTuple result = alphabetaPrunePositions(p, depth - 1, alpha, beta);
+            float eval = get<0>(result);
             if (eval < extEval) {
                 extEval = eval;
                 bestMove = m;
