@@ -52,11 +52,11 @@ void EvaluationSequence() {
     zobrist::initialise_zobrist_keys();
 
     Position p;
-    p.set("3K4/Pp1p1N1n/bpPppk1P/PN2pp2/1p1P1PBb/2RPB2q/3Pn3/1r1Q2Rr b - - 0 1", p);
+    p.set("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", p);
 
     whiteTurn = p.turn() == WHITE;
 
-    int depth = 6;
+    int depth = 8;
 
     EvalMoveTuple bestMoveResult = alphabetaPrunePositions(p, depth, -100000, 100000);
 
